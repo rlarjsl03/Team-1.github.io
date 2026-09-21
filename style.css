@@ -1375,6 +1375,53 @@ button {
   color: var(--muted);
 }
 
+.team-links {
+  margin-top: 42px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(66, 217, 255, 0.2);
+}
+
+.team-links h3 {
+  margin: 0 0 16px;
+  color: var(--text);
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.team-link-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.team-link-grid a {
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+  border: 1px solid rgba(66, 217, 255, 0.24);
+  border-radius: var(--radius);
+  background: rgba(12, 29, 49, 0.72);
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.team-link-grid a:hover {
+  transform: translateY(-3px);
+  border-color: rgba(99, 230, 190, 0.78);
+  background: rgba(20, 55, 76, 0.78);
+}
+
+.team-link-grid strong {
+  color: var(--text);
+}
+
+.team-link-grid span {
+  margin: 0;
+  color: var(--cyan);
+  font-size: 0.9rem;
+  word-break: break-all;
+}
+
 /* Scroll reveal --------------------------------------------------------- */
 .reveal {
   opacity: 0;
@@ -1439,7 +1486,8 @@ button {
   .step-system,
   .research-card,
   .benefit-challenge,
-  .compare-labels {
+  .compare-labels,
+  .team-link-grid {
     grid-template-columns: 1fr;
   }
 
