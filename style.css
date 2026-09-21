@@ -1,0 +1,1521 @@
+/* Base theme ------------------------------------------------------------ */
+:root {
+  --bg: #07111f;
+  --bg-2: #0a1829;
+  --panel: rgba(12, 28, 48, 0.78);
+  --panel-strong: rgba(15, 40, 66, 0.94);
+  --line: rgba(100, 210, 255, 0.22);
+  --line-strong: rgba(111, 227, 255, 0.62);
+  --text: #e8f6ff;
+  --muted: #9bb5c9;
+  --cyan: #42d9ff;
+  --blue: #4c8dff;
+  --green: #63e6be;
+  --warning: #ffc66d;
+  --danger: #ff7d8b;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+  --radius: 8px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 18% 12%, rgba(66, 217, 255, 0.12), transparent 32rem),
+    radial-gradient(circle at 86% 18%, rgba(76, 141, 255, 0.11), transparent 34rem),
+    linear-gradient(180deg, #06101d 0%, #091524 42%, #07111f 100%);
+  font-family: Arial, "Noto Sans KR", "Malgun Gothic", sans-serif;
+  line-height: 1.65;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+}
+
+.site-grid {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(87, 188, 230, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(87, 188, 230, 0.07) 1px, transparent 1px);
+  background-size: 58px 58px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent 88%);
+  z-index: -1;
+}
+
+.section-panel {
+  position: relative;
+  min-height: 100vh;
+  padding: 112px clamp(18px, 5vw, 72px);
+}
+
+.content-section {
+  max-width: 1220px;
+  margin: 0 auto;
+}
+
+.section-heading {
+  max-width: 860px;
+  margin-bottom: 38px;
+}
+
+.section-heading h2,
+.hero h1,
+.final-copy h2 {
+  margin: 0;
+  letter-spacing: 0;
+  line-height: 1.06;
+}
+
+.section-heading h2 {
+  font-size: clamp(2rem, 4vw, 4rem);
+}
+
+.section-heading p {
+  color: var(--muted);
+  font-size: 1.06rem;
+}
+
+.section-number,
+.eyebrow,
+.info-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--cyan);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.lead-question {
+  color: var(--text) !important;
+  font-size: clamp(1.24rem, 2.2vw, 1.6rem) !important;
+  font-weight: 700;
+}
+
+.primary-button,
+.secondary-button,
+.mode-button,
+.step-button,
+.connect-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  border: 1px solid rgba(98, 215, 255, 0.5);
+  border-radius: var(--radius);
+  color: var(--text);
+  background: linear-gradient(135deg, rgba(66, 217, 255, 0.22), rgba(76, 141, 255, 0.14));
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.primary-button {
+  padding: 0 22px;
+  font-weight: 700;
+}
+
+.secondary-button,
+.mode-button,
+.step-button,
+.connect-button {
+  padding: 0 16px;
+}
+
+.primary-button:hover,
+.secondary-button:hover,
+.mode-button:hover,
+.step-button:hover,
+.connect-button:hover {
+  transform: translateY(-2px);
+  border-color: rgba(99, 230, 190, 0.8);
+}
+
+/* Navigation ------------------------------------------------------------ */
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  height: 76px;
+  padding: 0 clamp(18px, 5vw, 72px);
+  border-bottom: 1px solid rgba(99, 213, 255, 0.12);
+  background: rgba(6, 16, 29, 0.62);
+  backdrop-filter: blur(18px);
+  transition: height 180ms ease, background 180ms ease;
+}
+
+.top-nav.compact {
+  height: 62px;
+  background: rgba(5, 13, 24, 0.92);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.brand-mark {
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(66, 217, 255, 0.68);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, var(--cyan) 0 3px, transparent 4px),
+    conic-gradient(from 90deg, transparent, rgba(66, 217, 255, 0.42), transparent);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-links a {
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  transition: color 160ms ease, background 160ms ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--text);
+  background: rgba(66, 217, 255, 0.12);
+}
+
+.nav-toggle {
+  display: none;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(9, 24, 41, 0.8);
+}
+
+.nav-toggle span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  margin: 4px auto;
+  background: var(--text);
+}
+
+/* Hero ------------------------------------------------------------------ */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.86fr);
+  align-items: center;
+  gap: clamp(34px, 7vw, 92px);
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+.hero h1 {
+  max-width: 820px;
+  margin-top: 14px;
+  font-size: clamp(3.4rem, 8vw, 7.4rem);
+}
+
+.hero h2 {
+  margin: 20px 0 0;
+  color: #cfefff;
+  font-size: clamp(1.35rem, 2.2vw, 2rem);
+}
+
+.hero-description {
+  max-width: 700px;
+  margin: 22px 0 30px;
+  color: var(--muted);
+  font-size: 1.12rem;
+}
+
+.hero-network {
+  min-height: 480px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(145deg, rgba(10, 24, 41, 0.72), rgba(7, 17, 31, 0.38));
+  box-shadow: var(--shadow);
+}
+
+.hero-network svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 430px;
+}
+
+.network-line,
+.coop-line {
+  stroke: rgba(90, 218, 255, 0.38);
+  stroke-width: 2;
+  stroke-dasharray: 8 10;
+}
+
+.vehicle-node circle {
+  fill: rgba(9, 30, 51, 0.96);
+  stroke: rgba(99, 230, 190, 0.7);
+  stroke-width: 2;
+  filter: url(#heroGlow);
+}
+
+.vehicle-node text {
+  fill: var(--text);
+  font-size: 17px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.packet,
+.coop-packet {
+  fill: var(--cyan);
+  filter: url(#heroGlow);
+}
+
+.packet-one {
+  animation: packetVertical 2.6s linear infinite;
+}
+
+.packet-two {
+  animation: packetDiagonalOne 3s linear infinite;
+}
+
+.packet-three {
+  animation: packetDiagonalTwo 3.2s linear infinite;
+}
+
+.orbit-ring {
+  fill: none;
+  stroke: rgba(66, 217, 255, 0.16);
+  stroke-width: 1;
+}
+
+@keyframes packetVertical {
+  0% { transform: translateY(0); opacity: 0; }
+  10%, 88% { opacity: 1; }
+  100% { transform: translateY(135px); opacity: 0; }
+}
+
+@keyframes packetDiagonalOne {
+  0% { transform: translate(0, 0); opacity: 0; }
+  12%, 86% { opacity: 1; }
+  100% { transform: translate(200px, -50px); opacity: 0; }
+}
+
+@keyframes packetDiagonalTwo {
+  0% { transform: translate(0, 0); opacity: 0; }
+  12%, 86% { opacity: 1; }
+  100% { transform: translate(-200px, -85px); opacity: 0; }
+}
+
+/* Localization sensors -------------------------------------------------- */
+.sensor-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 26px;
+}
+
+.sensor-stage,
+.drift-demo,
+.cooperation-demo,
+.step-system,
+.compare-tool,
+.simulator,
+.ocean-scene,
+.acoustic-layout,
+.research-card,
+.benefit-challenge article {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.sensor-stage {
+  position: relative;
+  min-height: 430px;
+  overflow: hidden;
+}
+
+.sensor-stage::before {
+  content: "";
+  position: absolute;
+  inset: 22px;
+  border: 1px dashed rgba(66, 217, 255, 0.16);
+}
+
+.road {
+  position: absolute;
+  left: 16%;
+  right: 16%;
+  top: 50%;
+  height: 86px;
+  transform: translateY(-50%);
+  background:
+    linear-gradient(90deg, transparent 0 45%, rgba(255, 255, 255, 0.24) 45% 55%, transparent 55% 100%),
+    rgba(16, 34, 54, 0.9);
+}
+
+.css-car {
+  position: absolute;
+  width: 170px;
+  height: 72px;
+  border: 2px solid rgba(99, 230, 190, 0.9);
+  border-radius: 22px 34px 18px 18px;
+  background: linear-gradient(135deg, rgba(66, 217, 255, 0.32), rgba(76, 141, 255, 0.2));
+  box-shadow: 0 0 28px rgba(66, 217, 255, 0.18);
+}
+
+.css-car::before,
+.css-car::after {
+  content: "";
+  position: absolute;
+  bottom: -13px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #08111e;
+  border: 4px solid #c7eaff;
+}
+
+.css-car::before {
+  left: 24px;
+}
+
+.css-car::after {
+  right: 24px;
+}
+
+.css-car span {
+  position: absolute;
+  left: 48px;
+  top: 14px;
+  width: 68px;
+  height: 22px;
+  border-radius: 14px 20px 5px 5px;
+  background: rgba(224, 248, 255, 0.3);
+}
+
+.main-car {
+  left: 50%;
+  top: 52%;
+  transform: translate(-50%, -50%);
+}
+
+.sensor-chip {
+  position: absolute;
+  min-width: 92px;
+  min-height: 42px;
+  border: 1px solid rgba(66, 217, 255, 0.38);
+  border-radius: var(--radius);
+  color: var(--text);
+  background: rgba(7, 20, 35, 0.88);
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.sensor-chip:hover,
+.sensor-chip.active {
+  transform: translateY(-3px);
+  border-color: rgba(99, 230, 190, 0.9);
+  background: rgba(26, 75, 100, 0.8);
+}
+
+.sensor-chip::after {
+  content: "";
+  position: absolute;
+  width: 2px;
+  height: 88px;
+  left: 50%;
+  top: 100%;
+  background: linear-gradient(var(--line-strong), transparent);
+  transform-origin: top;
+}
+
+.sensor-gnss {
+  left: 50%;
+  top: 34px;
+  transform: translateX(-50%);
+}
+
+.sensor-gnss:hover,
+.sensor-gnss.active {
+  transform: translateX(-50%) translateY(-3px);
+}
+
+.sensor-gnss::after {
+  height: 110px;
+}
+
+.sensor-imu {
+  left: 10%;
+  top: 50%;
+}
+
+.sensor-imu::after {
+  top: 50%;
+  left: 100%;
+  height: 160px;
+  transform: rotate(90deg);
+}
+
+.sensor-lidar {
+  right: 10%;
+  top: 50%;
+}
+
+.sensor-lidar::after {
+  top: 50%;
+  left: auto;
+  right: 100%;
+  height: 160px;
+  transform: rotate(-90deg);
+}
+
+.sensor-camera {
+  left: 50%;
+  bottom: 38px;
+  transform: translateX(-50%);
+}
+
+.sensor-camera:hover,
+.sensor-camera.active {
+  transform: translateX(-50%) translateY(-3px);
+}
+
+.sensor-camera::after {
+  top: auto;
+  bottom: 100%;
+  height: 90px;
+  background: linear-gradient(transparent, var(--line-strong));
+}
+
+.sensor-info {
+  min-height: 260px;
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel-strong);
+}
+
+.sensor-info h3 {
+  margin: 16px 0 10px;
+  font-size: 2rem;
+}
+
+.sensor-info p:last-child {
+  color: var(--muted);
+}
+
+/* Problem section ------------------------------------------------------- */
+.problem-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.problem-card,
+.application-card {
+  min-height: 190px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--text);
+  background: rgba(12, 29, 49, 0.78);
+}
+
+.problem-card span,
+.application-card span {
+  color: var(--cyan);
+  font-weight: 800;
+}
+
+.problem-card h3,
+.application-card h3 {
+  margin: 14px 0 8px;
+  line-height: 1.2;
+}
+
+.problem-card p,
+.application-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.drift-demo {
+  margin-top: 26px;
+  padding: 26px;
+}
+
+.drift-track {
+  position: relative;
+  height: 230px;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background:
+    linear-gradient(90deg, rgba(66, 217, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(66, 217, 255, 0.08) 1px, transparent 1px),
+    rgba(5, 17, 30, 0.76);
+  background-size: 45px 45px;
+}
+
+.path-line {
+  position: absolute;
+  left: 7%;
+  top: 50%;
+  width: 86%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.mini-car {
+  position: absolute;
+  width: 86px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px 20px 10px 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.actual-car {
+  left: 7%;
+  top: 96px;
+  color: #06201a;
+  background: var(--green);
+  animation: actualMove 7s linear infinite;
+}
+
+.estimated-car {
+  left: 7%;
+  top: 132px;
+  border: 1px dashed var(--danger);
+  color: var(--danger);
+  background: rgba(255, 125, 139, 0.12);
+  animation: estimatedDrift 7s linear infinite;
+}
+
+.bridge-message {
+  margin: 22px 0 0;
+  text-align: center;
+  color: var(--text);
+  font-size: clamp(1.3rem, 2.5vw, 2.2rem);
+  font-weight: 800;
+}
+
+@keyframes actualMove {
+  from { transform: translateX(0); }
+  to { transform: translateX(760px); }
+}
+
+@keyframes estimatedDrift {
+  from { transform: translate(0, 0); }
+  to { transform: translate(760px, 42px); }
+}
+
+/* Cooperative and steps ------------------------------------------------- */
+.cooperation-demo {
+  position: relative;
+  padding: 24px;
+  overflow: hidden;
+}
+
+.connect-button {
+  position: absolute;
+  right: 24px;
+  top: 24px;
+  z-index: 1;
+}
+
+.cooperation-demo svg {
+  width: 100%;
+  min-height: 390px;
+}
+
+.coop-line,
+.coop-packet {
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+
+.cooperation-demo.connected .coop-line,
+.cooperation-demo.connected .coop-packet {
+  opacity: 1;
+}
+
+.cooperation-demo.connected .p1 {
+  animation: coopPacketOne 2.5s linear infinite;
+}
+
+.cooperation-demo.connected .p2 {
+  animation: coopPacketTwo 2.8s linear infinite;
+}
+
+.cooperation-demo.connected .p3 {
+  animation: coopPacketThree 3s linear infinite;
+}
+
+@keyframes coopPacketOne {
+  from { transform: translate(0, 0); }
+  to { transform: translate(330px, 0); }
+}
+
+@keyframes coopPacketTwo {
+  from { transform: translate(0, 0); }
+  to { transform: translate(-160px, 170px); }
+}
+
+@keyframes coopPacketThree {
+  from { transform: translate(0, 0); }
+  to { transform: translate(-170px, -170px); }
+}
+
+.data-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.data-tags span,
+.paper-tags span {
+  display: inline-flex;
+  padding: 7px 11px;
+  border: 1px solid rgba(66, 217, 255, 0.28);
+  border-radius: 999px;
+  color: #ccefff;
+  background: rgba(66, 217, 255, 0.08);
+  font-size: 0.86rem;
+}
+
+.step-system {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 20px;
+  padding: 24px;
+}
+
+.step-buttons {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.step-button {
+  justify-content: flex-start;
+  color: var(--muted);
+  background: rgba(8, 22, 38, 0.8);
+}
+
+.step-button.active,
+.mode-button.active {
+  color: var(--text);
+  border-color: rgba(99, 230, 190, 0.9);
+  background: rgba(25, 84, 101, 0.74);
+}
+
+.step-visual {
+  min-height: 380px;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: rgba(5, 15, 28, 0.72);
+}
+
+.flow-card {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  gap: 18px;
+  padding: clamp(20px, 5vw, 52px);
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.flow-card.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.flow-card h3 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 4rem);
+}
+
+.flow-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.flow-line,
+.two-node-flow,
+.fusion-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.flow-line span,
+.flow-line strong,
+.two-node-flow span,
+.two-node-flow b,
+.fusion-stack span,
+.fusion-stack strong,
+.fusion-stack em {
+  display: block;
+  padding: 15px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(66, 217, 255, 0.08);
+  font-style: normal;
+}
+
+.flow-line strong,
+.fusion-stack em {
+  color: var(--green);
+}
+
+/* Comparison ------------------------------------------------------------ */
+.compare-tool {
+  padding: 24px;
+}
+
+.compare-labels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 18px;
+}
+
+.compare-labels h3,
+.compare-labels p {
+  margin: 0;
+}
+
+.compare-labels p {
+  color: var(--muted);
+}
+
+.compare-stage {
+  position: relative;
+  height: 300px;
+  overflow: hidden;
+  border: 1px solid rgba(66, 217, 255, 0.14);
+  border-radius: var(--radius);
+  background: rgba(5, 15, 28, 0.74);
+}
+
+.compare-layer {
+  position: absolute;
+  inset: 0;
+}
+
+.cooperative-layer {
+  width: 50%;
+  overflow: hidden;
+  background: linear-gradient(90deg, rgba(19, 58, 72, 0.9), rgba(14, 35, 58, 0.9));
+}
+
+.cooperative-layer svg {
+  position: absolute;
+  inset: 0;
+  width: 800px;
+  height: 100%;
+}
+
+.cooperative-layer line {
+  stroke: rgba(99, 230, 190, 0.65);
+  stroke-width: 3;
+  stroke-dasharray: 10 12;
+  animation: dashFlow 2.6s linear infinite;
+}
+
+.dot-car {
+  position: absolute;
+  width: 50px;
+  height: 30px;
+  border-radius: 14px 18px 9px 9px;
+  background: var(--cyan);
+  box-shadow: 0 0 20px rgba(66, 217, 255, 0.28);
+}
+
+.dot-car::after {
+  content: "";
+  position: absolute;
+  inset: 8px 12px auto auto;
+  width: 14px;
+  height: 7px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.c1 { left: 18%; top: 28%; }
+.c2 { left: 50%; top: 63%; }
+.c3 { left: 78%; top: 26%; }
+
+.uncertainty {
+  position: absolute;
+  width: 94px;
+  height: 94px;
+  border: 1px dashed rgba(255, 125, 139, 0.6);
+  border-radius: 50%;
+  background: rgba(255, 125, 139, 0.05);
+}
+
+.u1 { left: calc(18% - 22px); top: calc(28% - 28px); }
+.u2 { left: calc(50% - 22px); top: calc(63% - 28px); }
+.u3 { left: calc(78% - 22px); top: calc(26% - 28px); }
+
+.compare-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 3px;
+  background: var(--text);
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.5);
+}
+
+.compare-slider {
+  width: 100%;
+  margin-top: 18px;
+  accent-color: var(--cyan);
+}
+
+@keyframes dashFlow {
+  to { stroke-dashoffset: -44; }
+}
+
+/* Simulator ------------------------------------------------------------- */
+.simulator {
+  padding: 22px;
+}
+
+.simulator-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.simulator-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 18px;
+}
+
+.sim-stage {
+  position: relative;
+  height: 430px;
+  overflow: hidden;
+  border: 1px solid rgba(66, 217, 255, 0.14);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(90deg, rgba(66, 217, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(66, 217, 255, 0.08) 1px, transparent 1px),
+    rgba(4, 16, 30, 0.86);
+  background-size: 54px 54px;
+}
+
+.sim-links {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.sim-stage.cooperative .sim-links {
+  opacity: 1;
+}
+
+.sim-link {
+  stroke: rgba(99, 230, 190, 0.58);
+  stroke-width: 2.5;
+  stroke-dasharray: 10 10;
+  animation: dashFlow 2.6s linear infinite;
+}
+
+.sim-object {
+  position: absolute;
+  width: 92px;
+  height: 54px;
+  transform: translate(-50%, -50%);
+}
+
+.sim-object b {
+  position: absolute;
+  left: 50%;
+  top: 36px;
+  transform: translateX(-50%);
+  color: var(--muted);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.actual-dot,
+.estimated-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 34px;
+  height: 21px;
+  border-radius: 12px 16px 8px 8px;
+  transform: translate(-50%, -50%);
+}
+
+.actual-dot {
+  background: var(--green);
+  box-shadow: 0 0 18px rgba(99, 230, 190, 0.32);
+}
+
+.estimated-dot {
+  border: 1px dashed var(--danger);
+  background: rgba(255, 125, 139, 0.1);
+}
+
+.sim-readout {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(7, 20, 35, 0.88);
+}
+
+.sim-readout h3 {
+  margin: 10px 0 16px;
+}
+
+.error-bar {
+  height: 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.error-bar span {
+  display: block;
+  width: 60%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--green), var(--warning), var(--danger));
+  transition: width 140ms linear;
+}
+
+.legend {
+  display: grid;
+  gap: 8px;
+  margin: 18px 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.legend span {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.legend i {
+  width: 18px;
+  height: 12px;
+  border-radius: 5px;
+}
+
+.legend-actual {
+  background: var(--green);
+}
+
+.legend-estimated {
+  border: 1px dashed var(--danger);
+}
+
+#errorChart {
+  width: 100%;
+  height: 120px;
+}
+
+/* AUV and acoustic ------------------------------------------------------ */
+.ocean-scene {
+  overflow: hidden;
+}
+
+.sky,
+.underwater {
+  position: relative;
+  min-height: 260px;
+}
+
+.sky {
+  background: linear-gradient(180deg, rgba(17, 48, 78, 0.86), rgba(13, 58, 91, 0.5));
+}
+
+.water-surface {
+  height: 54px;
+  display: grid;
+  place-items: center;
+  color: #d9fbff;
+  font-weight: 800;
+  background:
+    linear-gradient(90deg, transparent 0 20px, rgba(255, 255, 255, 0.16) 20px 42px, transparent 42px 60px),
+    rgba(54, 181, 213, 0.34);
+  background-size: 60px 100%;
+}
+
+.underwater {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, rgba(5, 67, 91, 0.62), rgba(4, 20, 38, 0.98));
+}
+
+.satellite {
+  position: absolute;
+  top: 50px;
+  left: 12%;
+  padding: 13px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: rgba(5, 15, 28, 0.8);
+}
+
+.gnss-signal {
+  position: absolute;
+  left: 20%;
+  top: 102px;
+  width: 160px;
+  height: 300px;
+  border-left: 2px solid rgba(66, 217, 255, 0.55);
+  border-right: 2px solid rgba(66, 217, 255, 0.22);
+  transform: skewX(-16deg);
+  animation: signalFade 2.2s ease-in-out infinite;
+}
+
+.signal-block {
+  position: absolute;
+  top: 34px;
+  left: 28%;
+  color: var(--danger);
+  font-size: 4rem;
+  font-weight: 900;
+}
+
+.auv-shape,
+.auv-unit {
+  display: grid;
+  place-items: center;
+  width: 128px;
+  height: 46px;
+  border-radius: 28px 34px 18px 18px;
+  border: 1px solid rgba(99, 230, 190, 0.8);
+  color: #06201a;
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  font-weight: 800;
+}
+
+.underwater p {
+  position: absolute;
+  bottom: 22px;
+  margin: 0;
+  color: var(--muted);
+}
+
+@keyframes signalFade {
+  0%, 100% { opacity: 0.85; height: 170px; }
+  50% { opacity: 0.22; height: 260px; }
+}
+
+.acoustic-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 18px;
+  padding: 22px;
+}
+
+.acoustic-scene {
+  position: relative;
+  min-height: 330px;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, rgba(7, 55, 78, 0.72), rgba(4, 18, 35, 0.9));
+}
+
+.auv-unit {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.auv-unit.left {
+  left: 10%;
+}
+
+.auv-unit.right {
+  right: 10%;
+}
+
+.wave {
+  position: absolute;
+  top: 50%;
+  left: 24%;
+  width: 80px;
+  height: 80px;
+  border: 2px solid rgba(66, 217, 255, 0.58);
+  border-left-color: transparent;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  animation: acousticWave 2.4s linear infinite;
+}
+
+.wave-two {
+  animation-delay: 0.55s;
+}
+
+.wave-three {
+  animation-delay: 1.1s;
+}
+
+@keyframes acousticWave {
+  from { left: 23%; opacity: 0; transform: translateY(-50%) rotate(45deg) scale(0.4); }
+  20%, 75% { opacity: 1; }
+  to { left: 66%; opacity: 0; transform: translateY(-50%) rotate(45deg) scale(1.3); }
+}
+
+.acoustic-flow {
+  display: grid;
+  gap: 10px;
+  align-content: center;
+}
+
+.acoustic-flow span,
+.acoustic-flow strong,
+.acoustic-flow em {
+  padding: 13px 15px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(66, 217, 255, 0.08);
+  font-style: normal;
+}
+
+.acoustic-flow strong,
+.acoustic-flow em {
+  color: var(--green);
+}
+
+/* Research, applications and final ------------------------------------- */
+.research-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 26px;
+  padding: 28px;
+}
+
+.research-card h3 {
+  margin: 12px 0;
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
+}
+
+.paper-meta,
+.research-card p {
+  color: var(--muted);
+}
+
+.paper-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.application-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.application-card {
+  min-height: 240px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease;
+}
+
+.application-card:hover,
+.application-card.active {
+  transform: translateY(-5px);
+  border-color: rgba(99, 230, 190, 0.82);
+}
+
+.application-card em {
+  display: block;
+  max-height: 0;
+  margin-top: 0;
+  overflow: hidden;
+  color: var(--green);
+  font-style: normal;
+  transition: max-height 200ms ease, margin-top 200ms ease;
+}
+
+.application-card.active em {
+  max-height: 60px;
+  margin-top: 18px;
+}
+
+.benefit-challenge {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.benefit-challenge article {
+  padding: 28px;
+}
+
+.benefit-challenge h3 {
+  margin-top: 0;
+  color: var(--cyan);
+}
+
+.benefit-challenge ul {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.benefit-challenge li {
+  display: flex;
+  gap: 10px;
+  color: var(--muted);
+}
+
+.benefit-challenge li span {
+  display: grid;
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 50%;
+  color: #07111f;
+  background: var(--green);
+  font-weight: 900;
+}
+
+.benefit-challenge article:last-child li span {
+  background: var(--warning);
+}
+
+.final-section {
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+.final-copy {
+  max-width: 900px;
+}
+
+.final-copy p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: clamp(1.3rem, 3.8vw, 3.1rem);
+  font-weight: 900;
+}
+
+.final-copy p:nth-child(2) {
+  color: var(--text);
+}
+
+.final-copy h2 {
+  margin: 28px 0 18px;
+  color: var(--cyan);
+  font-size: clamp(2.4rem, 6vw, 5.2rem);
+}
+
+.final-copy span {
+  display: block;
+  max-width: 680px;
+  margin: 0 auto 28px;
+  color: var(--muted);
+}
+
+/* Scroll reveal --------------------------------------------------------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 620ms ease, transform 620ms ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Responsive ------------------------------------------------------------ */
+@media (max-width: 1040px) {
+  .hero,
+  .sensor-layout,
+  .simulator-body,
+  .acoustic-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-network {
+    min-height: 420px;
+  }
+
+  .problem-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .application-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 820px) {
+  .section-panel {
+    padding: 94px 18px;
+  }
+
+  .nav-toggle {
+    display: block;
+  }
+
+  .nav-links {
+    position: fixed;
+    top: 62px;
+    left: 18px;
+    right: 18px;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: rgba(5, 13, 24, 0.98);
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .step-system,
+  .research-card,
+  .benefit-challenge,
+  .compare-labels {
+    grid-template-columns: 1fr;
+  }
+
+  .sensor-stage {
+    min-height: 380px;
+  }
+
+  .sensor-chip {
+    min-width: 78px;
+    font-size: 0.82rem;
+  }
+
+  .sensor-imu {
+    left: 5%;
+  }
+
+  .sensor-lidar {
+    right: 5%;
+  }
+
+  .problem-grid,
+  .application-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sim-readout {
+    order: -1;
+  }
+}
+
+@media (max-width: 560px) {
+  .brand span:last-child {
+    display: none;
+  }
+
+  .hero h1 {
+    font-size: 3rem;
+  }
+
+  .hero-network svg {
+    min-height: 330px;
+  }
+
+  .css-car {
+    width: 132px;
+    height: 58px;
+  }
+
+  .sensor-chip::after {
+    display: none;
+  }
+
+  .compare-stage,
+  .sim-stage {
+    height: 340px;
+  }
+
+  .actual-car,
+  .estimated-car {
+    animation-duration: 5.5s;
+  }
+
+  .underwater p {
+    left: 18px;
+    right: 18px;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+}

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cooperative Localization</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="site-grid" aria-hidden="true"></div>
+
+  <header class="top-nav" id="topNav">
+    <a class="brand" href="#hero" aria-label="Cooperative Localization home">
+      <span class="brand-mark"></span>
+      <span>Cooperative Localization</span>
+    </a>
+    <button class="nav-toggle" id="navToggle" type="button" aria-label="Open navigation" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
+      <a href="#overview">Overview</a>
+      <a href="#how">How It Works</a>
+      <a href="#simulation">Simulation</a>
+      <a href="#auv">AUV Case</a>
+      <a href="#research">Research</a>
+      <a href="#applications">Applications</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero section-panel" id="hero" data-nav="overview">
+      <div class="hero-copy reveal">
+        <p class="eyebrow">Connected Autonomous Navigation</p>
+        <h1>COOPERATIVE LOCALIZATION</h1>
+        <h2>자율주행 차량은 서로의 위치를 어떻게 도와줄까?</h2>
+        <p class="hero-description">
+          혼자 찾는 위치보다, 함께 찾는 위치가 더 정확하다.
+          자율주행 차량들이 서로의 위치와 센서 정보를 공유하여 위치 추정을 개선하는
+          Cooperative Localization을 알아보자.
+        </p>
+        <a class="primary-button" href="#overview">Explore Technology</a>
+      </div>
+
+      <div class="hero-network reveal" aria-label="Vehicles exchanging data packets">
+        <svg viewBox="0 0 520 420" role="img">
+          <defs>
+            <filter id="heroGlow">
+              <feGaussianBlur stdDeviation="3" result="blur"></feGaussianBlur>
+              <feMerge>
+                <feMergeNode in="blur"></feMergeNode>
+                <feMergeNode in="SourceGraphic"></feMergeNode>
+              </feMerge>
+            </filter>
+          </defs>
+          <line class="network-line" x1="155" y1="150" x2="155" y2="285"></line>
+          <line class="network-line" x1="155" y1="285" x2="355" y2="235"></line>
+          <line class="network-line" x1="155" y1="150" x2="355" y2="235"></line>
+          <circle class="packet packet-one" r="6" cx="155" cy="150"></circle>
+          <circle class="packet packet-two" r="6" cx="155" cy="285"></circle>
+          <circle class="packet packet-three" r="6" cx="355" cy="235"></circle>
+          <g class="vehicle-node" transform="translate(155 150)">
+            <circle r="48"></circle>
+            <text y="-6">Vehicle</text>
+            <text y="16">A</text>
+          </g>
+          <g class="vehicle-node" transform="translate(155 285)">
+            <circle r="48"></circle>
+            <text y="-6">Vehicle</text>
+            <text y="16">B</text>
+          </g>
+          <g class="vehicle-node" transform="translate(355 235)">
+            <circle r="48"></circle>
+            <text y="-6">Vehicle</text>
+            <text y="16">C</text>
+          </g>
+          <path class="orbit-ring" d="M88 86 C202 15 415 64 449 198 C486 344 304 405 151 356 C24 315 -7 176 88 86Z"></path>
+        </svg>
+      </div>
+    </section>
+
+    <section class="content-section section-panel" id="overview" data-nav="overview">
+      <div class="section-heading reveal">
+        <span class="section-number">01</span>
+        <h2>What is Localization?</h2>
+        <p class="lead-question">“자율주행 차량은 자신의 위치를 어떻게 알까?”</p>
+        <p>
+          Localization은 자율주행 차량이 자신의 현재 위치와 자세를 추정하는 기술이다.
+          차량은 GNSS, IMU, LiDAR, Camera 같은 센서 정보를 결합해 지도 또는 세계 좌표 안에서
+          자신이 어디에 있고 어느 방향을 보고 있는지 계산한다.
+        </p>
+      </div>
+
+      <div class="sensor-layout reveal">
+        <div class="sensor-stage" aria-label="Localization sensor diagram">
+          <div class="road"></div>
+          <div class="css-car main-car">
+            <span></span>
+          </div>
+          <button class="sensor-chip sensor-gnss active" type="button" data-sensor="gnss">GNSS</button>
+          <button class="sensor-chip sensor-imu" type="button" data-sensor="imu">IMU</button>
+          <button class="sensor-chip sensor-lidar" type="button" data-sensor="lidar">LiDAR</button>
+          <button class="sensor-chip sensor-camera" type="button" data-sensor="camera">Camera</button>
+        </div>
+        <aside class="sensor-info" id="sensorInfo">
+          <p class="info-label">Selected Sensor</p>
+          <h3>GNSS</h3>
+          <p>위성 신호를 이용해 차량의 전역 위치를 추정한다.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="content-section section-panel" id="problem" data-nav="overview">
+      <div class="section-heading reveal">
+        <span class="section-number">02</span>
+        <h2>Why Isn't Localization Perfect?</h2>
+        <p>
+          실제 환경에서는 센서가 항상 완벽하지 않다. 신호가 끊기거나, 노이즈가 섞이거나,
+          이전 위치를 누적해서 추정하는 과정에서 오차가 조금씩 커질 수 있다.
+        </p>
+      </div>
+
+      <div class="problem-grid reveal">
+        <article class="problem-card">
+          <span>01</span>
+          <h3>GNSS Signal Loss</h3>
+          <p>도심 협곡, 터널, 실내에서는 위성 신호가 약해지거나 사라질 수 있다.</p>
+        </article>
+        <article class="problem-card">
+          <span>02</span>
+          <h3>Sensor Noise</h3>
+          <p>센서 측정값에는 작은 오차와 환경 노이즈가 포함된다.</p>
+        </article>
+        <article class="problem-card">
+          <span>03</span>
+          <h3>Dead Reckoning Drift</h3>
+          <p>움직임을 누적해서 계산하면 시간이 지날수록 추정 위치가 밀릴 수 있다.</p>
+        </article>
+        <article class="problem-card">
+          <span>04</span>
+          <h3>Tunnel / Indoor Environment</h3>
+          <p>지도와 센서만으로 위치를 유지해야 하는 구간에서는 불확실성이 커진다.</p>
+        </article>
+        <article class="problem-card">
+          <span>05</span>
+          <h3>Underwater Environment</h3>
+          <p>수중에서는 GNSS를 직접 사용할 수 없어 다른 항법 정보가 중요하다.</p>
+        </article>
+      </div>
+
+      <div class="drift-demo reveal" aria-label="Actual position and estimated position drift">
+        <div class="drift-track">
+          <div class="path-line"></div>
+          <div class="actual-car mini-car">Actual</div>
+          <div class="estimated-car mini-car">Estimated</div>
+        </div>
+        <p class="bridge-message">What if vehicles could help each other?</p>
+      </div>
+    </section>
+
+    <section class="content-section section-panel" id="cooperative" data-nav="how">
+      <div class="section-heading reveal">
+        <span class="section-number">03</span>
+        <h2>Cooperative Localization</h2>
+        <p>
+          Cooperative Localization은 여러 자율주행·자율운항 차량이 서로의 위치 정보,
+          상대 거리 측정값, 센서 정보 또는 상태 추정 정보를 공유하여 각 차량의 위치추정을
+          개선하는 기술이다. 적절하고 신뢰할 수 있는 통신과 상대 측정이 있을 때 효과를 기대할 수 있다.
+        </p>
+      </div>
+
+      <div class="cooperation-demo reveal" id="cooperationDemo">
+        <button class="secondary-button connect-button" id="connectButton" type="button">Create Cooperative Links</button>
+        <svg viewBox="0 0 760 430" aria-label="Cooperative vehicle network">
+          <line class="coop-line line-ab" x1="210" y1="145" x2="540" y2="145"></line>
+          <line class="coop-line line-ac" x1="210" y1="145" x2="380" y2="315"></line>
+          <line class="coop-line line-bc" x1="540" y1="145" x2="380" y2="315"></line>
+          <circle class="coop-packet p1" r="6" cx="210" cy="145"></circle>
+          <circle class="coop-packet p2" r="6" cx="540" cy="145"></circle>
+          <circle class="coop-packet p3" r="6" cx="380" cy="315"></circle>
+          <g class="vehicle-node" transform="translate(210 145)">
+            <circle r="54"></circle>
+            <text y="-8">Vehicle A</text>
+            <text y="18">Position</text>
+          </g>
+          <g class="vehicle-node" transform="translate(540 145)">
+            <circle r="54"></circle>
+            <text y="-8">Vehicle B</text>
+            <text y="18">Velocity</text>
+          </g>
+          <g class="vehicle-node" transform="translate(380 315)">
+            <circle r="54"></circle>
+            <text y="-8">Vehicle C</text>
+            <text y="18">Ranging</text>
+          </g>
+        </svg>
+        <div class="data-tags" aria-label="Shared data examples">
+          <span>Position</span>
+          <span>Velocity</span>
+          <span>Heading</span>
+          <span>Relative Distance</span>
+          <span>Sensor Data</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section section-panel" id="how" data-nav="how">
+      <div class="section-heading reveal">
+        <span class="section-number">04</span>
+        <h2>How Does It Work?</h2>
+      </div>
+
+      <div class="step-system reveal">
+        <div class="step-buttons" role="tablist" aria-label="How cooperative localization works">
+          <button class="step-button active" type="button" data-step="estimate">STEP 1 · Estimate</button>
+          <button class="step-button" type="button" data-step="communicate">STEP 2 · Communicate</button>
+          <button class="step-button" type="button" data-step="cooperate">STEP 3 · Cooperate</button>
+        </div>
+        <div class="step-visual" id="stepVisual">
+          <div class="flow-card active" data-step-panel="estimate">
+            <h3>Estimate</h3>
+            <p>각 차량이 자신의 센서를 이용해 위치를 추정한다.</p>
+            <div class="flow-line">
+              <span>GNSS + IMU + Sensor Data</span>
+              <strong>Initial Position Estimate</strong>
+            </div>
+          </div>
+          <div class="flow-card" data-step-panel="communicate">
+            <h3>Communicate</h3>
+            <p>차량들이 위치 관련 정보를 서로 교환한다.</p>
+            <div class="two-node-flow">
+              <span>Vehicle A</span>
+              <b>↔ Communication</b>
+              <span>Vehicle B</span>
+            </div>
+          </div>
+          <div class="flow-card" data-step-panel="cooperate">
+            <h3>Cooperate</h3>
+            <p>자신의 센서 정보와 다른 차량의 정보를 결합한다.</p>
+            <div class="fusion-stack">
+              <span>My Sensor Data</span>
+              <span>Other Vehicle Data</span>
+              <span>Relative Measurement</span>
+              <strong>Sensor Fusion / State Estimation</strong>
+              <em>Improved Position Estimate</em>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section section-panel" id="comparison" data-nav="how">
+      <div class="section-heading reveal">
+        <span class="section-number">05</span>
+        <h2>Independent vs Cooperative</h2>
+        <p>중앙 슬라이더를 움직여 차량들이 독립적으로 위치를 추정하는 상태와 협력하는 상태를 비교해보자.</p>
+      </div>
+
+      <div class="compare-tool reveal">
+        <div class="compare-labels">
+          <div>
+            <h3>Independent Localization</h3>
+            <p>각 차량이 자신의 센서 정보만 사용하여 위치를 추정한다.</p>
+          </div>
+          <div>
+            <h3>Cooperative Localization</h3>
+            <p>자신의 센서 정보와 다른 차량의 정보를 함께 사용한다.</p>
+          </div>
+        </div>
+        <div class="compare-stage" id="compareStage">
+          <div class="compare-layer independent-layer">
+            <div class="dot-car c1"></div>
+            <div class="dot-car c2"></div>
+            <div class="dot-car c3"></div>
+            <span class="uncertainty u1"></span>
+            <span class="uncertainty u2"></span>
+            <span class="uncertainty u3"></span>
+          </div>
+          <div class="compare-layer cooperative-layer" id="cooperativeLayer">
+            <svg viewBox="0 0 800 280" preserveAspectRatio="none">
+              <line x1="170" y1="90" x2="420" y2="195"></line>
+              <line x1="420" y1="195" x2="635" y2="85"></line>
+              <line x1="170" y1="90" x2="635" y2="85"></line>
+            </svg>
+            <div class="dot-car c1"></div>
+            <div class="dot-car c2"></div>
+            <div class="dot-car c3"></div>
+          </div>
+          <div class="compare-divider" id="compareDivider"></div>
+        </div>
+        <input class="compare-slider" id="compareSlider" type="range" min="0" max="100" value="50" aria-label="Compare independent and cooperative localization">
+      </div>
+    </section>
+
+    <section class="content-section section-panel" id="simulation" data-nav="simulation">
+      <div class="section-heading reveal">
+        <span class="section-number">06</span>
+        <h2>Try Cooperative Localization</h2>
+        <p>
+          아래 값은 실제 연구 결과가 아니라 개념 이해를 위한 <strong>Simulation Example / Illustrative Value</strong>이다.
+          Cooperative Mode에서는 상대 거리와 공유 정보를 사용할 수 있다고 가정하여 추정 위치가 실제 위치에 가까워지는 모습을 보여준다.
+        </p>
+      </div>
+
+      <div class="simulator reveal">
+        <div class="simulator-controls">
+          <button class="mode-button active" type="button" data-mode="independent">Independent Mode</button>
+          <button class="mode-button" type="button" data-mode="cooperative">Cooperative Mode</button>
+        </div>
+        <div class="simulator-body">
+          <div class="sim-stage" id="simStage" aria-label="Interactive localization simulation">
+            <svg class="sim-links" viewBox="0 0 900 420" preserveAspectRatio="none">
+              <line class="sim-link l1" x1="220" y1="110" x2="520" y2="200"></line>
+              <line class="sim-link l2" x1="520" y1="200" x2="700" y2="310"></line>
+              <line class="sim-link l3" x1="220" y1="110" x2="700" y2="310"></line>
+            </svg>
+            <div class="sim-object" data-id="0"><span class="estimated-dot"></span><span class="actual-dot"></span><b>AUV A</b></div>
+            <div class="sim-object" data-id="1"><span class="estimated-dot"></span><span class="actual-dot"></span><b>AUV B</b></div>
+            <div class="sim-object" data-id="2"><span class="estimated-dot"></span><span class="actual-dot"></span><b>AUV C</b></div>
+          </div>
+          <aside class="sim-readout">
+            <p class="info-label">Simulation Example</p>
+            <h3>Estimated Error: <span id="errorValue">12.0</span> m</h3>
+            <div class="error-bar" aria-label="Estimated error bar">
+              <span id="errorBar"></span>
+            </div>
+            <div class="legend">
+              <span><i class="legend-actual"></i>Actual Position</span>
+              <span><i class="legend-estimated"></i>Estimated Position</span>
+            </div>
+            <canvas id="errorChart" width="320" height="120" aria-label="Estimated error chart"></canvas>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section section-panel auv-section" id="auv" data-nav="auv">
+      <div class="section-heading reveal">
+        <span class="section-number">07</span>
+        <h2>Case Study — Autonomous Underwater Vehicle</h2>
+        <p class="lead-question">“GPS가 닿지 않는 바닷속에서는 어떻게 위치를 찾을까?”</p>
+        <p>
+          AUV는 수중에서 GNSS를 직접 이용하기 어렵기 때문에 INS, DVL, Acoustic Positioning 등의 기술을 이용해 위치를 추정한다.
+          그래서 다른 AUV와 협력해 상대 측정과 항법 정보를 활용하는 Cooperative Localization이 중요한 응용 사례가 된다.
+        </p>
+      </div>
+
+      <div class="ocean-scene reveal" aria-label="GNSS cannot travel directly underwater">
+        <div class="sky">
+          <div class="satellite">Satellite / GNSS</div>
+          <div class="gnss-signal"></div>
+        </div>
+        <div class="water-surface">Water Surface</div>
+        <div class="underwater">
+          <div class="signal-block">×</div>
+          <div class="auv-shape">AUV</div>
+          <p>GNSS 신호는 수중까지 안정적으로 전달되기 어렵다.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section section-panel" id="acoustic" data-nav="auv">
+      <div class="section-heading reveal">
+        <span class="section-number">08</span>
+        <h2>Acoustic Cooperative Localization</h2>
+        <p>
+          수중에서는 AUV 사이의 <strong>Acoustic Ranging</strong>으로 상대 거리를 측정하고,
+          <strong>Acoustic Communication</strong>으로 항법 정보나 상태 정보를 교환하여 Cooperative Localization에 활용할 수 있다.
+        </p>
+      </div>
+
+      <div class="acoustic-layout reveal">
+        <div class="acoustic-scene" aria-label="Acoustic signals between AUVs">
+          <div class="auv-unit left">AUV A</div>
+          <div class="wave wave-one"></div>
+          <div class="wave wave-two"></div>
+          <div class="wave wave-three"></div>
+          <div class="auv-unit right">AUV B</div>
+        </div>
+        <div class="acoustic-flow">
+          <span>AUV Navigation Data</span>
+          <span>Acoustic Ranging</span>
+          <span>Other AUV Information</span>
+          <strong>Cooperative Localization</strong>
+          <em>Improved Position Estimate</em>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section section-panel" id="research" data-nav="research">
+      <div class="section-heading reveal">
+        <span class="section-number">09</span>
+        <h2>Research Spotlight</h2>
+      </div>
+
+      <article class="research-card reveal">
+        <div>
+          <p class="info-label">The International Journal of Robotics Research · 2009</p>
+          <h3>Cooperative Localization for Autonomous Underwater Vehicles</h3>
+          <p class="paper-meta">
+            Alexander Bahr, John J. Leonard, Maurice F. Fallon<br>
+            Volume 28, Issue 6, Pages 714–728<br>
+            DOI: 10.1177/0278364908100561
+          </p>
+          <p>
+            고정된 위치의 acoustic transponder에만 의존하는 대신, 이동하는 AUV들이 acoustic ranging과 데이터를 교환하면서
+            서로의 위치추정을 돕는 Cooperative Localization 방법을 연구하였다.
+          </p>
+          <div class="paper-tags">
+            <span>#AUV</span>
+            <span>#CooperativeLocalization</span>
+            <span>#AcousticRanging</span>
+            <span>#AutonomousNavigation</span>
+          </div>
+        </div>
+        <a class="primary-button" href="https://doi.org/10.1177/0278364908100561" target="_blank" rel="noopener noreferrer">View Research</a>
+      </article>
+    </section>
+
+    <section class="content-section section-panel" id="applications" data-nav="applications">
+      <div class="section-heading reveal">
+        <span class="section-number">10</span>
+        <h2>Where Can It Be Used?</h2>
+      </div>
+
+      <div class="application-grid reveal">
+        <button class="application-card" type="button">
+          <span>01</span>
+          <h3>Autonomous Cars</h3>
+          <p>차량 간 정보 공유를 이용하여 위치추정을 보조한다.</p>
+          <em>Connected road scenario expands.</em>
+        </button>
+        <button class="application-card" type="button">
+          <span>02</span>
+          <h3>Autonomous Drones</h3>
+          <p>여러 UAV가 협력 임무를 수행할 때 상대 위치 정보와 센서 정보를 활용한다.</p>
+          <em>Formation nodes become linked.</em>
+        </button>
+        <button class="application-card" type="button">
+          <span>03</span>
+          <h3>Multi-Robot Systems</h3>
+          <p>공장, 창고, 구조 현장 등의 여러 로봇이 서로 협력한다.</p>
+          <em>Shared map confidence rises.</em>
+        </button>
+        <button class="application-card" type="button">
+          <span>04</span>
+          <h3>Autonomous Underwater Vehicles</h3>
+          <p>GNSS 사용이 어려운 수중에서 Acoustic Ranging과 항법 정보 공유를 이용한다.</p>
+          <em>Acoustic links support navigation.</em>
+        </button>
+      </div>
+    </section>
+
+    <section class="content-section section-panel" id="benefits" data-nav="applications">
+      <div class="section-heading reveal">
+        <span class="section-number">11</span>
+        <h2>Benefits & Challenges</h2>
+      </div>
+
+      <div class="benefit-challenge reveal">
+        <article>
+          <h3>BENEFITS</h3>
+          <ul>
+            <li><span>+</span>다른 차량의 정보를 추가적으로 활용 가능</li>
+            <li><span>+</span>GNSS가 제한되는 환경에서도 활용 가능</li>
+            <li><span>+</span>여러 자율주행 차량의 협력 가능</li>
+            <li><span>+</span>자동차, 드론, 로봇, AUV 등 다양한 플랫폼에 적용 가능</li>
+          </ul>
+        </article>
+        <article>
+          <h3>CHALLENGES</h3>
+          <ul>
+            <li><span>!</span>차량 간 통신 필요</li>
+            <li><span>!</span>Network Delay</li>
+            <li><span>!</span>Packet Loss</li>
+            <li><span>!</span>Sensor Error</li>
+            <li><span>!</span>Communication Overhead</li>
+            <li><span>!</span>Security / Trust</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="final-section section-panel" id="final" data-nav="applications">
+      <div class="final-copy reveal">
+        <p>ALONE, A VEHICLE ESTIMATES.</p>
+        <p>TOGETHER, VEHICLES COOPERATE.</p>
+        <h2>COOPERATIVE LOCALIZATION</h2>
+        <span>
+          자율주행 차량은 더 이상 자신의 센서만 바라보지 않는다.
+          서로 정보를 공유하고 협력하면서 자신의 위치를 추정한다.
+        </span>
+        <a class="secondary-button" href="#hero">Back to Top</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
