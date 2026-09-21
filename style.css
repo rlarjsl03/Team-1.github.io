@@ -1390,24 +1390,32 @@ button {
 }
 
 .team-link-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.team-link-grid a {
-  display: grid;
-  gap: 4px;
-  padding: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  overflow: hidden;
   border: 1px solid rgba(66, 217, 255, 0.24);
   border-radius: var(--radius);
   background: rgba(12, 29, 49, 0.72);
+}
+
+.team-link-grid a {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 16px 18px;
   transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
 }
 
+.team-link-grid a + a {
+  border-left: 1px solid rgba(66, 217, 255, 0.24);
+}
+
 .team-link-grid a:hover {
-  transform: translateY(-3px);
-  border-color: rgba(99, 230, 190, 0.78);
+  transform: none;
   background: rgba(20, 55, 76, 0.78);
 }
 
@@ -1486,9 +1494,17 @@ button {
   .step-system,
   .research-card,
   .benefit-challenge,
-  .compare-labels,
-  .team-link-grid {
+  .compare-labels {
     grid-template-columns: 1fr;
+  }
+
+  .team-link-grid {
+    flex-direction: column;
+  }
+
+  .team-link-grid a + a {
+    border-left: 0;
+    border-top: 1px solid rgba(66, 217, 255, 0.24);
   }
 
   .sensor-stage {
