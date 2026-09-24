@@ -78,6 +78,11 @@ const sensorDescriptions = {
   }
 };
 
+sensorDescriptions.gnss.text = "위성 신호를 이용해 전역 위치를 추정합니다. 신호 차단과 multipath에는 취약합니다.";
+sensorDescriptions.imu.text = "가속도와 회전 정보를 이용해 움직임을 추적하지만 시간이 지나면 drift가 누적됩니다.";
+sensorDescriptions.lidar.text = "주변 환경의 3차원 구조와 특징을 측정해 위치 추정을 보조합니다.";
+sensorDescriptions.camera.text = "주변의 시각적 특징을 인식해 위치와 움직임 추정을 보조합니다.";
+
 const sensorInfo = document.getElementById("sensorInfo");
 const sensorChips = Array.from(document.querySelectorAll(".sensor-chip"));
 

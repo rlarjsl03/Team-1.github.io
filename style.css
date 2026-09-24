@@ -1583,3 +1583,22 @@ button {
     transition-duration: 1ms !important;
   }
 }
+
+/* Research-led content extensions ------------------------------------- */
+.section-heading > p + p { max-width: 900px; }
+.info-card-grid, .auv-sensor-grid, .challenge-grid, .architecture-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.info-card-grid article, .auv-sensor-grid article, .challenge-grid article, .architecture-grid article { padding: 24px; border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(145deg, rgba(15, 40, 66, .8), rgba(9, 23, 40, .76)); box-shadow: var(--shadow); }
+.info-card-grid h3, .auv-sensor-grid h3, .challenge-grid h3, .architecture-grid h3 { margin: 10px 0 8px; color: var(--text); }
+.info-card-grid p, .auv-sensor-grid p, .challenge-grid p, .architecture-grid p { margin: 0; color: var(--muted); }
+.card-kicker, .sensor-icon, .challenge-grid article > span { color: var(--cyan); font-size: .76rem; font-weight: 800; letter-spacing: .11em; text-transform: uppercase; }
+.sensor-icon { display: inline-grid; width: 68px; height: 44px; place-items: center; border: 1px solid var(--line-strong); border-radius: 6px; background: rgba(66,217,255,.08); }
+.packet-example { display: grid; grid-template-columns: 1fr minmax(260px, 380px); gap: 18px; align-items: center; margin-top: 18px; padding: 22px; border: 1px solid rgba(99,230,190,.36); border-radius: var(--radius); background: rgba(7, 25, 40, .86); }
+.packet-example h3 { margin: 9px 0 0; }.packet-example h3 b { color: var(--green); padding: 0 8px; }.packet-example code { padding: 16px; border: 1px solid var(--line); color: var(--green); background: rgba(0,0,0,.2); font: .86rem/1.8 Consolas, monospace; }.packet-example small { grid-column: 1 / -1; color: var(--muted); }
+.callout, .tradeoff { padding: 16px 18px; border-left: 3px solid var(--green); color: var(--text) !important; background: rgba(99,230,190,.08); }
+.comparison-table { margin-top: 30px; overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); }.table-row { display: grid; grid-template-columns: 1.2fr 1fr 1.2fr; min-width: 660px; border-bottom: 1px solid rgba(100,210,255,.14); }.table-row:last-child { border-bottom: 0; }.table-row > * { padding: 13px 16px; color: var(--muted); }.table-row > b { color: var(--text); }.table-head { background: rgba(66,217,255,.1); }.table-head > * { color: var(--cyan); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; }
+.why-underwater { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: center; margin-top: 18px; padding: 20px 24px; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(66,217,255,.06); }.why-underwater p { margin: 0; color: var(--muted); }
+.mini-diagram { display: grid; gap: 7px; min-height: 90px; place-items: center; margin: 16px 0; padding: 14px; border: 1px dashed rgba(66,217,255,.4); border-radius: 6px; color: var(--green); background: rgba(3, 14, 26, .56); text-align: center; }.mini-diagram i { color: var(--cyan); font-style: normal; }
+.related-themes { margin-top: 22px; padding: 20px 0 0; border-top: 1px solid var(--line); }.related-themes .data-tags { margin-top: 12px; }
+.application-card small { display: block; margin-top: 12px; color: var(--cyan); font-size: .78rem; }.tradeoff { margin-top: 18px; text-align: center; border: 1px solid rgba(255,198,109,.42); border-left-width: 1px; background: rgba(255,198,109,.08); }.tradeoff strong { color: var(--warning); font-size: 1.15rem; }.tradeoff p { max-width: 760px; margin: 8px auto 0; color: var(--muted); }
+.technology-flow { display: grid; gap: 10px; justify-items: center; }.technology-flow > div { display: grid; gap: 3px; width: min(100%, 720px); padding: 16px 20px; border: 1px solid var(--line); border-radius: var(--radius); text-align: center; background: rgba(12, 35, 57, .8); }.technology-flow b { color: var(--cyan); }.technology-flow span { color: var(--muted); font-size: .9rem; }.technology-flow i { color: var(--green); font-style: normal; }.technology-flow .flow-result { border-color: rgba(99,230,190,.66); background: rgba(99,230,190,.1); }.technology-flow .flow-result b { color: var(--green); font-size: 1.1rem; }
+@media (max-width: 820px) { .info-card-grid, .auv-sensor-grid, .challenge-grid, .architecture-grid { grid-template-columns: 1fr; }.packet-example, .why-underwater { grid-template-columns: 1fr; }.packet-example code { grid-column: auto; }.packet-example small { grid-column: auto; } }
