@@ -6,10 +6,14 @@ const navItems = Array.from(document.querySelectorAll(".nav-links a"));
 const revealItems = Array.from(document.querySelectorAll(".reveal"));
 const sectionPanels = Array.from(document.querySelectorAll("[data-nav]"));
 const paperDemoSection = document.getElementById("paper-demo");
+const interactiveLabSection = document.getElementById("interactive-lab");
 const finalSection = document.getElementById("final");
 
 if (paperDemoSection && finalSection) {
   finalSection.before(paperDemoSection);
+}
+if (interactiveLabSection && finalSection) {
+  finalSection.before(interactiveLabSection);
 }
 
 function setActiveNavigation(activeKey) {
@@ -89,8 +93,10 @@ window.addEventListener("keydown", (event) => {
     activeElement.matches("input, textarea, select") ||
     activeElement.isContentEditable
   );
+  const labBounds = interactiveLabSection?.getBoundingClientRect();
+  const labIsActive = labBounds && labBounds.top < window.innerHeight * 0.68 && labBounds.bottom > window.innerHeight * 0.32;
 
-  if (isTyping || !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+  if (isTyping || (labIsActive && ["ArrowLeft", "ArrowRight"].includes(event.key)) || !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
 
   const currentIndex = getCurrentSectionIndex();
   const direction = event.key === "ArrowRight" ? 1 : -1;
@@ -465,6 +471,444 @@ paperDrOnly.addEventListener("click", () => resetPaperDemo("dead-reckoning"));
 paperEnable.addEventListener("click", () => resetPaperDemo("cooperative"));
 resetPaperDemo();
 requestAnimationFrame(animatePaperDemo);
+
+/* Interactive Cooperative Localization Lab ----------------------------- */
+const labStage = document.getElementById("labStage");
+const labActualPath = document.getElementById("labActualPath");
+const labDrPath = document.getElementById("labDrPath");
+const labCoopPath = document.getElementById("labCoopPath");
+const labCandidateLayer = document.getElementById("labCandidateLayer");
+const labActualAuv = document.getElementById("labActualAuv");
+const labDrAuv = document.getElementById("labDrAuv");
+const labCoopAuv = document.getElementById("labCoopAuv");
+const labCnas = {
+  A: document.getElementById("labCnaA"),
+  B: document.getElementById("labCnaB")
+};
+const labRangeCircles = {
+  A: document.getElementById("labRangeCircleA"),
+  B: document.getElementById("labRangeCircleB")
+};
+const labRangeBands = {
+  A: document.getElementById("labRangeBandA"),
+  B: document.getElementById("labRangeBandB")
+};
+const labPingLines = {
+  A: document.getElementById("labPingLineA"),
+  B: document.getElementById("labPingLineB")
+};
+const labPingButtons = {
+  A: document.getElementById("labPingA"),
+  B: document.getElementById("labPingB")
+};
+const labRunUpdate = document.getElementById("labRunUpdate");
+const labReset = document.getElementById("labReset");
+const labNoise = document.getElementById("labNoise");
+const labNoiseValue = document.getElementById("labNoiseValue");
+const labDelay = document.getElementById("labDelay");
+const labActualReadout = document.getElementById("labActualReadout");
+const labDrReadout = document.getElementById("labDrReadout");
+const labDrError = document.getElementById("labDrError");
+const labCoopError = document.getElementById("labCoopError");
+const labStageMessage = document.getElementById("labStageMessage");
+const labStaleWarning = document.getElementById("labStaleWarning");
+const labCandidateList = document.getElementById("labCandidateList");
+const labBestCandidate = document.getElementById("labBestCandidate");
+const labImprovement = document.getElementById("labImprovement");
+const LAB_SCALE = 10;
+const LAB_BOUNDS = { minX: 55, maxX: 845, minY: 65, maxY: 485 };
+const labInitialState = {
+  actual: { x: 450, y: 340 },
+  cnaA: { x: 180, y: 145 },
+  cnaB: { x: 720, y: 165 }
+};
+
+let labState;
+let labDraggingCna = null;
+const labPingTokens = { A: 0, B: 0 };
+
+function labClonePoint(point) {
+  return { x: point.x, y: point.y };
+}
+
+function labDistance(first, second) {
+  return Math.hypot(first.x - second.x, first.y - second.y);
+}
+
+function labClampPoint(point) {
+  return {
+    x: Math.max(LAB_BOUNDS.minX, Math.min(LAB_BOUNDS.maxX, point.x)),
+    y: Math.max(LAB_BOUNDS.minY, Math.min(LAB_BOUNDS.maxY, point.y))
+  };
+}
+
+function labPathFromPoints(points) {
+  return points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`).join(" ");
+}
+
+function labMeters(value) {
+  return `${(value / LAB_SCALE).toFixed(1)} m`;
+}
+
+function labPosition(point) {
+  return `(${(point.x / LAB_SCALE).toFixed(1)}, ${(point.y / LAB_SCALE).toFixed(1)}) m`;
+}
+
+function labNoiseSigma() {
+  return 1.2 + (Number(labNoise.value) / 100) * 20;
+}
+
+function labRandomNoise(sigma = labNoiseSigma()) {
+  labState.noiseSeed = (labState.noiseSeed * 1664525 + 1013904223) >>> 0;
+  const uniform = labState.noiseSeed / 4294967296;
+  labState.noiseSeed = (labState.noiseSeed * 1664525 + 1013904223) >>> 0;
+  const second = labState.noiseSeed / 4294967296;
+  const gaussian = Math.sqrt(-2 * Math.log(Math.max(uniform, 0.0001))) * Math.cos(2 * Math.PI * second);
+  return gaussian * sigma * 0.55;
+}
+
+function labSeedCnaHistory(point) {
+  const now = Date.now();
+  return [2000, 1200, 400, 0].map((age) => ({ ...labClonePoint(point), time: now - age }));
+}
+
+function labRecordCnaPosition(key) {
+  labState.cnaHistory[key].push({ ...labClonePoint(labState.cnas[key]), time: Date.now() });
+  if (labState.cnaHistory[key].length > 120) labState.cnaHistory[key].shift();
+}
+
+function labDelayedCnaPosition(key) {
+  const delay = Number(labDelay.value);
+  const targetTime = Date.now() - delay;
+  const history = labState.cnaHistory[key];
+  let selected = history[0];
+  history.forEach((sample) => {
+    if (sample.time <= targetTime && sample.time >= selected.time) selected = sample;
+  });
+  return { position: { x: selected.x, y: selected.y }, age: Math.max(delay, Date.now() - selected.time) };
+}
+
+function labMeasurementPanel(key) {
+  return document.querySelectorAll(`#labMeasure${key} dd`);
+}
+
+function labClearMeasurement(key) {
+  labState.measurements[key] = null;
+  labRangeCircles[key].classList.remove("visible");
+  labRangeBands[key].classList.remove("visible");
+  labMeasurementPanel(key).forEach((value) => { value.textContent = "—"; });
+  labRunUpdate.disabled = !(labState.measurements.A && labState.measurements.B);
+  labStaleWarning.classList.toggle("visible", Object.values(labState.measurements).some((item) => item && item.age > 150));
+}
+
+function labRenderBaselineCandidates() {
+  const baselineCosts = [5.4, 1.8, 0, 1.8, 5.4];
+  Array.from(labCandidateList.children).forEach((item, index) => {
+    item.classList.toggle("selected", index === 2);
+    item.querySelector("b").textContent = `Prior ${baselineCosts[index].toFixed(1)}`;
+  });
+  labBestCandidate.textContent = "DR prior only";
+}
+
+function labResetState() {
+  labPingTokens.A += 1;
+  labPingTokens.B += 1;
+  labPingButtons.A.disabled = false;
+  labPingButtons.B.disabled = false;
+  const actual = labClonePoint(labInitialState.actual);
+  labState = {
+    actual,
+    dr: labClonePoint(actual),
+    cooperative: null,
+    cnas: { A: labClonePoint(labInitialState.cnaA), B: labClonePoint(labInitialState.cnaB) },
+    cnaHistory: { A: labSeedCnaHistory(labInitialState.cnaA), B: labSeedCnaHistory(labInitialState.cnaB) },
+    actualHistory: [labClonePoint(actual)],
+    drHistory: [labClonePoint(actual)],
+    cooperativeHistory: [],
+    measurements: { A: null, B: null },
+    moveCount: 0,
+    headingBias: 0,
+    scaleBias: 0,
+    noiseSeed: 20250924
+  };
+  ["A", "B"].forEach(labClearMeasurement);
+  labCandidateLayer.replaceChildren();
+  labCoopAuv.classList.remove("visible");
+  labImprovement.innerHTML = "<span>Before / After</span><strong>Run an update</strong>";
+  labStageMessage.textContent = "Move the AUV to accumulate dead-reckoning drift.";
+  labRenderBaselineCandidates();
+  labRender();
+}
+
+function labRenderRange(key) {
+  const measurement = labState.measurements[key];
+  if (!measurement) return;
+  const circle = labRangeCircles[key];
+  const band = labRangeBands[key];
+  [circle, band].forEach((element) => {
+    element.setAttribute("cx", measurement.navPosition.x);
+    element.setAttribute("cy", measurement.navPosition.y);
+    element.setAttribute("r", measurement.measuredRange);
+    element.classList.add("visible");
+  });
+  band.style.strokeWidth = `${Math.max(7, measurement.sigma * 2.8)}px`;
+}
+
+function labRender() {
+  labActualPath.setAttribute("d", labPathFromPoints(labState.actualHistory));
+  labDrPath.setAttribute("d", labPathFromPoints(labState.drHistory));
+  labCoopPath.setAttribute("d", labState.cooperativeHistory.length ? labPathFromPoints(labState.cooperativeHistory) : "");
+  labActualAuv.setAttribute("transform", `translate(${labState.actual.x} ${labState.actual.y})`);
+  labDrAuv.setAttribute("transform", `translate(${labState.dr.x} ${labState.dr.y})`);
+  labCnas.A.setAttribute("transform", `translate(${labState.cnas.A.x} ${labState.cnas.A.y})`);
+  labCnas.B.setAttribute("transform", `translate(${labState.cnas.B.x} ${labState.cnas.B.y})`);
+  if (labState.cooperative) {
+    labCoopAuv.setAttribute("transform", `translate(${labState.cooperative.x} ${labState.cooperative.y})`);
+    labCoopAuv.classList.add("visible");
+  }
+  labActualReadout.textContent = labPosition(labState.actual);
+  labDrReadout.textContent = labPosition(labState.dr);
+  labDrError.textContent = labMeters(labDistance(labState.actual, labState.dr));
+  labCoopError.textContent = labState.cooperative ? labMeters(labDistance(labState.actual, labState.cooperative)) : "—";
+  labRenderRange("A");
+  labRenderRange("B");
+}
+
+function labMoveAuv(dx, dy) {
+  const nextActual = labClampPoint({ x: labState.actual.x + dx, y: labState.actual.y + dy });
+  const appliedDx = nextActual.x - labState.actual.x;
+  const appliedDy = nextActual.y - labState.actual.y;
+  if (!appliedDx && !appliedDy) return;
+
+  labState.moveCount += 1;
+  labState.headingBias = Math.min(0.24, labState.headingBias + 0.0045);
+  labState.scaleBias = Math.min(0.09, labState.scaleBias + 0.0014);
+  const cosine = Math.cos(labState.headingBias);
+  const sine = Math.sin(labState.headingBias);
+  const scale = 1 + labState.scaleBias;
+  const drDx = (appliedDx * cosine - appliedDy * sine) * scale;
+  const drDy = (appliedDx * sine + appliedDy * cosine) * scale;
+
+  labState.actual = nextActual;
+  labState.dr = labClampPoint({ x: labState.dr.x + drDx, y: labState.dr.y + drDy });
+  if (labState.cooperative) {
+    labState.cooperative = labClampPoint({ x: labState.cooperative.x + drDx, y: labState.cooperative.y + drDy });
+    labState.cooperativeHistory.push(labClonePoint(labState.cooperative));
+  }
+  labState.actualHistory.push(labClonePoint(labState.actual));
+  labState.drHistory.push(labClonePoint(labState.dr));
+  labStageMessage.textContent = "Dead-reckoning drift is accumulating. Acquire ranges to add geometric constraints.";
+  labRender();
+}
+
+function labMoveCna(key, point) {
+  labPingTokens[key] += 1;
+  labPingButtons[key].disabled = false;
+  labState.cnas[key] = labClampPoint(point);
+  labRecordCnaPosition(key);
+  labClearMeasurement(key);
+  labCandidateLayer.replaceChildren();
+  labBestCandidate.textContent = "Re-acquire ranges";
+  labStageMessage.textContent = `CNA ${key} moved. Its previous range was invalidated; PING again.`;
+  labRender();
+}
+
+function labUpdateNoiseLabel() {
+  const value = Number(labNoise.value);
+  labNoiseValue.textContent = value < 34 ? "Low" : value < 68 ? "Medium" : "High";
+}
+
+function labTriggerPingAnimation(key) {
+  const line = labPingLines[key];
+  const cna = labState.cnas[key];
+  line.setAttribute("x1", cna.x);
+  line.setAttribute("y1", cna.y);
+  line.setAttribute("x2", labState.actual.x);
+  line.setAttribute("y2", labState.actual.y);
+  line.classList.remove("active");
+  void line.getBoundingClientRect();
+  line.classList.add("active");
+  window.setTimeout(() => line.classList.remove("active"), 2250);
+}
+
+function labPing(key) {
+  const token = ++labPingTokens[key];
+  const pingCna = labClonePoint(labState.cnas[key]);
+  const pingActual = labClonePoint(labState.actual);
+  const delayed = labDelayedCnaPosition(key);
+  const sigma = labNoiseSigma();
+  const pathIndex = labState.drHistory.length - 1;
+  labPingButtons[key].disabled = true;
+  labTriggerPingAnimation(key);
+  labStageMessage.textContent = `CNA ${key}: acoustic ping is propagating through the water...`;
+
+  window.setTimeout(() => {
+    if (token !== labPingTokens[key]) return;
+    const trueRange = labDistance(pingCna, pingActual);
+    const noise = labRandomNoise(sigma);
+    const measurement = {
+      trueRange,
+      measuredRange: Math.max(5, trueRange + noise),
+      error: noise,
+      sigma,
+      navPosition: delayed.position,
+      age: delayed.age,
+      pathIndex
+    };
+    labState.measurements[key] = measurement;
+    const values = labMeasurementPanel(key);
+    values[0].textContent = labMeters(measurement.trueRange);
+    values[1].textContent = labMeters(measurement.measuredRange);
+    values[2].textContent = `${measurement.error >= 0 ? "+" : ""}${(measurement.error / LAB_SCALE).toFixed(2)} m`;
+    values[3].textContent = `${Math.round(measurement.age)} ms`;
+    labStaleWarning.classList.toggle("visible", Object.values(labState.measurements).some((item) => item && item.age > 150));
+    labRunUpdate.disabled = !(labState.measurements.A && labState.measurements.B);
+    labPingButtons[key].disabled = false;
+    labStageMessage.textContent = `CNA ${key}: range-only constraint acquired. One range does not uniquely determine position.`;
+    labRender();
+  }, 700);
+}
+
+function labTrajectoryForOffset(offset) {
+  const denominator = Math.max(labState.drHistory.length - 1, 1);
+  return labState.drHistory.map((point, index) => {
+    const ratio = index / denominator;
+    return { x: point.x + offset.x * ratio, y: point.y + offset.y * ratio };
+  });
+}
+
+function labCandidateCost(offset) {
+  const trajectory = labTrajectoryForOffset(offset);
+  let cost = 0.0015 * (offset.x ** 2 + offset.y ** 2);
+  Object.values(labState.measurements).forEach((measurement) => {
+    if (!measurement) return;
+    const index = Math.min(measurement.pathIndex, trajectory.length - 1);
+    const predictedRange = labDistance(trajectory[index], measurement.navPosition);
+    const residual = predictedRange - measurement.measuredRange;
+    cost += (residual ** 2) / (measurement.sigma ** 2 + 9);
+  });
+  return cost;
+}
+
+function labFindBestOffset() {
+  let best = { x: 0, y: 0, cost: Number.POSITIVE_INFINITY };
+  for (let x = -120; x <= 120; x += 12) {
+    for (let y = -120; y <= 120; y += 12) {
+      const cost = labCandidateCost({ x, y });
+      if (cost < best.cost) best = { x, y, cost };
+    }
+  }
+  return best;
+}
+
+function labRunCooperativeUpdate() {
+  if (!(labState.measurements.A && labState.measurements.B)) return;
+  const best = labFindBestOffset();
+  const variations = [
+    { x: best.x - 38, y: best.y - 20 },
+    { x: best.x - 20, y: best.y + 24 },
+    { x: best.x, y: best.y },
+    { x: best.x + 22, y: best.y - 22 },
+    { x: best.x + 40, y: best.y + 22 }
+  ].map((offset, index) => ({ offset, index, cost: labCandidateCost(offset), trajectory: labTrajectoryForOffset(offset) }));
+  const selected = variations.reduce((lowest, candidate) => candidate.cost < lowest.cost ? candidate : lowest, variations[0]);
+
+  labCandidateLayer.replaceChildren();
+  variations.forEach((candidate) => {
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", labPathFromPoints(candidate.trajectory));
+    path.setAttribute("class", `lab-candidate-path${candidate === selected ? " selected" : ""}`);
+    labCandidateLayer.append(path);
+  });
+  Array.from(labCandidateList.children).forEach((item, index) => {
+    item.classList.toggle("selected", variations[index] === selected);
+    item.querySelector("b").textContent = `Cost ${variations[index].cost.toFixed(2)}`;
+  });
+
+  labState.cooperativeHistory = selected.trajectory.map(labClonePoint);
+  labState.cooperative = labClonePoint(selected.trajectory[selected.trajectory.length - 1]);
+  const beforeError = labDistance(labState.actual, labState.dr);
+  const afterError = labDistance(labState.actual, labState.cooperative);
+  const improvement = beforeError > 0.01 ? (1 - afterError / beforeError) * 100 : 0;
+  labBestCandidate.textContent = `MINIMUM COST · ${String.fromCharCode(65 + selected.index)}`;
+  labImprovement.innerHTML = `<span>DR ${labMeters(beforeError)} → Cooperative ${labMeters(afterError)}</span><strong>${improvement >= 0 ? "Improvement" : "Change"} ${improvement.toFixed(0)}%</strong>`;
+  labStageMessage.textContent = "Best consistent trajectory selected from DR prior + acoustic range residual cost.";
+  labRender();
+}
+
+function labPointerPosition(event) {
+  const point = labStage.createSVGPoint();
+  point.x = event.clientX;
+  point.y = event.clientY;
+  const matrix = labStage.getScreenCTM();
+  return matrix ? point.matrixTransform(matrix.inverse()) : { x: 450, y: 270 };
+}
+
+labStage.addEventListener("pointerdown", (event) => {
+  const target = event.target.closest?.(".lab-cna");
+  if (!target) return;
+  event.preventDefault();
+  labDraggingCna = { key: target.dataset.cna, pointerId: event.pointerId };
+  labStage.setPointerCapture(event.pointerId);
+});
+
+labStage.addEventListener("pointermove", (event) => {
+  if (!labDraggingCna || labDraggingCna.pointerId !== event.pointerId) return;
+  labMoveCna(labDraggingCna.key, labPointerPosition(event));
+});
+
+function labEndPointer(event) {
+  if (!labDraggingCna || labDraggingCna.pointerId !== event.pointerId) return;
+  labDraggingCna = null;
+  if (labStage.hasPointerCapture(event.pointerId)) labStage.releasePointerCapture(event.pointerId);
+}
+
+labStage.addEventListener("pointerup", labEndPointer);
+labStage.addEventListener("pointercancel", labEndPointer);
+
+document.querySelectorAll("[data-lab-move]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const moves = { up: [0, -16], down: [0, 16], left: [-16, 0], right: [16, 0] };
+    labMoveAuv(...moves[button.dataset.labMove]);
+  });
+});
+
+window.addEventListener("keydown", (event) => {
+  const bounds = interactiveLabSection.getBoundingClientRect();
+  const labIsActive = bounds.top < window.innerHeight * 0.68 && bounds.bottom > window.innerHeight * 0.32;
+  if (!labIsActive) return;
+  const focusedCna = event.target.closest?.("[data-cna]");
+  const activeElement = document.activeElement;
+  const isControl = activeElement && (activeElement.matches("input, button, select, textarea, summary") || activeElement.isContentEditable);
+  const keyMoves = {
+    ArrowUp: [0, -16], w: [0, -16], W: [0, -16],
+    ArrowDown: [0, 16], s: [0, 16], S: [0, 16],
+    ArrowLeft: [-16, 0], a: [-16, 0], A: [-16, 0],
+    ArrowRight: [16, 0], d: [16, 0], D: [16, 0]
+  };
+  const movement = keyMoves[event.key];
+  if (!movement) return;
+  if (focusedCna) {
+    event.preventDefault();
+    const key = focusedCna.dataset.cna;
+    labMoveCna(key, { x: labState.cnas[key].x + movement[0], y: labState.cnas[key].y + movement[1] });
+    return;
+  }
+  if (isControl) return;
+  event.preventDefault();
+  labMoveAuv(...movement);
+});
+
+labPingButtons.A.addEventListener("click", () => labPing("A"));
+labPingButtons.B.addEventListener("click", () => labPing("B"));
+labRunUpdate.addEventListener("click", labRunCooperativeUpdate);
+labReset.addEventListener("click", labResetState);
+labNoise.addEventListener("input", labUpdateNoiseLabel);
+labDelay.addEventListener("change", () => {
+  labStageMessage.textContent = Number(labDelay.value) ? "Communication delay enabled: future pings may use stale CNA navigation states." : "Communication delay disabled.";
+});
+labUpdateNoiseLabel();
+labResetState();
 
 /* Application cards ----------------------------------------------------- */
 const applicationCards = Array.from(document.querySelectorAll(".application-card"));
