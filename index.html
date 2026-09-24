@@ -34,11 +34,11 @@
       <div class="hero-copy reveal">
         <p class="eyebrow">Connected Autonomous Navigation</p>
         <h1>COOPERATIVE LOCALIZATION</h1>
-        <h2>자율주행 차량은 서로의 위치를 어떻게 도와줄까?</h2>
+        <h2>자율주행 시스템은 서로의 위치를 어떻게 보정할까?</h2>
         <p class="hero-description">
-          혼자 찾는 위치보다, 함께 찾는 위치가 더 정확하다.
-          자율주행 차량들이 서로의 위치와 센서 정보를 공유하여 위치 추정을 개선하는
-          Cooperative Localization을 알아보자.
+          혼자 추정한 위치보다, 함께 검증한 위치가 더 신뢰할 수 있다.
+          자율주행 차량과 AUV가 센서, 통신, 상대 거리 정보를 공유해 위치 추정 오차를 줄이는
+          Cooperative Localization의 원리를 살펴보자.
         </p>
         <a class="primary-button" href="#overview">Explore Technology</a>
       </div>
@@ -84,11 +84,11 @@
       <div class="section-heading reveal">
         <span class="section-number">01</span>
         <h2>What is Localization?</h2>
-        <p class="lead-question">“자율주행 차량은 자신의 위치를 어떻게 알까?”</p>
+        <p class="lead-question">자율주행 시스템은 자신의 위치를 어떻게 알까?</p>
         <p>
-          Localization은 자율주행 차량이 자신의 현재 위치와 자세를 추정하는 기술이다.
-          차량은 GNSS, IMU, LiDAR, Camera 같은 센서 정보를 결합해 지도 또는 세계 좌표 안에서
-          자신이 어디에 있고 어느 방향을 보고 있는지 계산한다.
+          Localization은 차량이나 로봇이 현재 위치와 자세를 추정하는 기술이다.
+          GNSS, IMU, LiDAR, Camera 같은 센서 정보를 결합해 지도 또는 세계 좌표계 안에서
+          내가 어디에 있고 어느 방향을 보고 있는지 계산한다.
         </p>
       </div>
 
@@ -106,7 +106,7 @@
         <aside class="sensor-info" id="sensorInfo">
           <p class="info-label">Selected Sensor</p>
           <h3>GNSS</h3>
-          <p>위성 신호를 이용해 차량의 전역 위치를 추정한다.</p>
+          <p>위성 신호를 이용해 전역 위치를 추정한다. 개방된 공간에서는 유용하지만 터널, 실내, 고층 건물 주변에서는 신호 품질이 떨어질 수 있다.</p>
         </aside>
       </div>
     </section>
@@ -116,8 +116,8 @@
         <span class="section-number">02</span>
         <h2>Why Isn't Localization Perfect?</h2>
         <p>
-          실제 환경에서는 센서가 항상 완벽하지 않다. 신호가 끊기거나, 노이즈가 섞이거나,
-          이전 위치를 누적해서 추정하는 과정에서 오차가 조금씩 커질 수 있다.
+          실제 환경에서는 센서가 항상 완벽하지 않다. 신호가 약해지거나, 측정값에 노이즈가 섞이거나,
+          이전 위치를 누적해서 계산하는 과정에서 작은 오차가 시간이 지날수록 커질 수 있다.
         </p>
       </div>
 
@@ -135,7 +135,7 @@
         <article class="problem-card">
           <span>03</span>
           <h3>Dead Reckoning Drift</h3>
-          <p>움직임을 누적해서 계산하면 시간이 지날수록 추정 위치가 밀릴 수 있다.</p>
+          <p>움직임을 누적해서 계산하면 시간이 지날수록 추정 위치가 실제 위치에서 멀어질 수 있다.</p>
         </article>
         <article class="problem-card">
           <span>04</span>
@@ -145,7 +145,7 @@
         <article class="problem-card">
           <span>05</span>
           <h3>Underwater Environment</h3>
-          <p>수중에서는 GNSS를 직접 사용할 수 없어 다른 항법 정보가 중요하다.</p>
+          <p>수중에서는 GNSS를 직접 사용할 수 없어 음향 거리 측정과 관성항법 같은 대체 정보가 중요하다.</p>
         </article>
       </div>
 
@@ -164,9 +164,9 @@
         <span class="section-number">03</span>
         <h2>Cooperative Localization</h2>
         <p>
-          Cooperative Localization은 여러 자율주행·자율운항 차량이 서로의 위치 정보,
-          상대 거리 측정값, 센서 정보 또는 상태 추정 정보를 공유하여 각 차량의 위치추정을
-          개선하는 기술이다. 적절하고 신뢰할 수 있는 통신과 상대 측정이 있을 때 효과를 기대할 수 있다.
+          Cooperative Localization은 여러 자율주행 차량, 로봇, AUV가 서로의 위치 정보,
+          상대 거리 측정값, 센서 정보, 상태 추정값을 공유해 각자의 위치 추정을 개선하는 기술이다.
+          한 시스템의 센서가 불안정할 때도 다른 시스템의 관측값을 함께 사용하면 오차를 줄이고 신뢰도를 높일 수 있다.
         </p>
       </div>
 
@@ -209,6 +209,10 @@
       <div class="section-heading reveal">
         <span class="section-number">04</span>
         <h2>How Does It Work?</h2>
+        <p>
+          협력 위치추정은 보통 개별 추정, 정보 교환, 센서 융합의 흐름으로 진행된다.
+          핵심은 다른 시스템의 정보를 그대로 믿는 것이 아니라, 내 센서와 상대 측정값을 함께 비교해 더 일관된 위치를 찾는 것이다.
+        </p>
       </div>
 
       <div class="step-system reveal">
@@ -220,7 +224,7 @@
         <div class="step-visual" id="stepVisual">
           <div class="flow-card active" data-step-panel="estimate">
             <h3>Estimate</h3>
-            <p>각 차량이 자신의 센서를 이용해 위치를 추정한다.</p>
+            <p>각 시스템이 자신의 센서로 현재 위치, 속도, 방향을 먼저 추정한다.</p>
             <div class="flow-line">
               <span>GNSS + IMU + Sensor Data</span>
               <strong>Initial Position Estimate</strong>
@@ -228,16 +232,16 @@
           </div>
           <div class="flow-card" data-step-panel="communicate">
             <h3>Communicate</h3>
-            <p>차량들이 위치 관련 정보를 서로 교환한다.</p>
+            <p>주변 시스템과 위치, 속도, heading, 상대 거리 같은 정보를 교환한다.</p>
             <div class="two-node-flow">
               <span>Vehicle A</span>
-              <b>↔ Communication</b>
+              <b>Communication</b>
               <span>Vehicle B</span>
             </div>
           </div>
           <div class="flow-card" data-step-panel="cooperate">
             <h3>Cooperate</h3>
-            <p>자신의 센서 정보와 다른 차량의 정보를 결합한다.</p>
+            <p>내 센서 정보와 다른 시스템의 정보를 결합해 더 일관된 상태를 계산한다.</p>
             <div class="fusion-stack">
               <span>My Sensor Data</span>
               <span>Other Vehicle Data</span>
@@ -254,18 +258,18 @@
       <div class="section-heading reveal">
         <span class="section-number">05</span>
         <h2>Independent vs Cooperative</h2>
-        <p>중앙 슬라이더를 움직여 차량들이 독립적으로 위치를 추정하는 상태와 협력하는 상태를 비교해보자.</p>
+        <p>중앙 슬라이더를 움직여 독립 위치추정과 협력 위치추정의 차이를 비교해보자.</p>
       </div>
 
       <div class="compare-tool reveal">
         <div class="compare-labels">
           <div>
             <h3>Independent Localization</h3>
-            <p>각 차량이 자신의 센서 정보만 사용하여 위치를 추정한다.</p>
+            <p>각 시스템이 자신의 센서 정보만 사용하여 위치를 추정한다. 센서 오차가 누적되면 불확실성도 함께 커진다.</p>
           </div>
           <div>
             <h3>Cooperative Localization</h3>
-            <p>자신의 센서 정보와 다른 차량의 정보를 함께 사용한다.</p>
+            <p>자신의 센서 정보와 다른 시스템의 정보를 함께 사용한다. 상대 거리와 공유 상태가 추가 제약 조건이 된다.</p>
           </div>
         </div>
         <div class="compare-stage" id="compareStage">
@@ -299,7 +303,7 @@
         <h2>Try Cooperative Localization</h2>
         <p>
           아래 값은 실제 연구 결과가 아니라 개념 이해를 위한 <strong>Simulation Example / Illustrative Value</strong>이다.
-          Cooperative Mode에서는 상대 거리와 공유 정보를 사용할 수 있다고 가정하여 추정 위치가 실제 위치에 가까워지는 모습을 보여준다.
+          Cooperative Mode에서는 상대 거리와 공유 상태 정보를 사용한다고 가정해 추정 위치가 실제 위치에 더 가까워지는 모습을 보여준다.
         </p>
       </div>
 
@@ -338,11 +342,12 @@
     <section class="content-section section-panel auv-section" id="auv" data-nav="auv">
       <div class="section-heading reveal">
         <span class="section-number">07</span>
-        <h2>Case Study — Autonomous Underwater Vehicle</h2>
-        <p class="lead-question">“GPS가 닿지 않는 바닷속에서는 어떻게 위치를 찾을까?”</p>
+        <h2>Case Study · Autonomous Underwater Vehicle</h2>
+        <p class="lead-question">GPS가 닿지 않는 바닷속에서는 어떻게 위치를 찾을까?</p>
         <p>
-          AUV는 수중에서 GNSS를 직접 이용하기 어렵기 때문에 INS, DVL, Acoustic Positioning 등의 기술을 이용해 위치를 추정한다.
-          그래서 다른 AUV와 협력해 상대 측정과 항법 정보를 활용하는 Cooperative Localization이 중요한 응용 사례가 된다.
+          AUV는 수중에서 GNSS를 직접 사용할 수 없기 때문에 INS, DVL, depth sensor, acoustic positioning 같은 기술로 위치를 추정한다.
+          하지만 관성항법은 시간이 지날수록 drift가 누적되고, 음향 통신은 느리며 잡음이 많다.
+          그래서 여러 AUV가 상대 거리와 항법 정보를 공유하는 Cooperative Localization이 중요한 활용 사례가 된다.
         </p>
       </div>
 
@@ -353,7 +358,7 @@
         </div>
         <div class="water-surface">Water Surface</div>
         <div class="underwater">
-          <div class="signal-block">×</div>
+          <div class="signal-block">X</div>
           <div class="auv-shape">AUV</div>
           <p>GNSS 신호는 수중까지 안정적으로 전달되기 어렵다.</p>
         </div>
@@ -367,6 +372,7 @@
         <p>
           수중에서는 AUV 사이의 <strong>Acoustic Ranging</strong>으로 상대 거리를 측정하고,
           <strong>Acoustic Communication</strong>으로 항법 정보나 상태 정보를 교환하여 Cooperative Localization에 활용할 수 있다.
+          이 과정에서 상대 거리 측정값은 각 AUV의 추정 위치가 서로 모순되지 않도록 묶어주는 제약 조건이 된다.
         </p>
       </div>
 
@@ -392,6 +398,9 @@
       <div class="section-heading reveal">
         <span class="section-number">09</span>
         <h2>Research Spotlight</h2>
+        <p>
+          아래 논문은 이동하는 AUV들이 acoustic ranging과 데이터 교환을 이용해 서로의 위치를 개선하는 방식을 다룬 대표적인 연구이다.
+        </p>
       </div>
 
       <article class="research-card reveal">
@@ -400,12 +409,13 @@
           <h3>Cooperative Localization for Autonomous Underwater Vehicles</h3>
           <p class="paper-meta">
             Alexander Bahr, John J. Leonard, Maurice F. Fallon<br>
-            Volume 28, Issue 6, Pages 714–728<br>
+            Volume 28, Issue 6, Pages 714-728<br>
             DOI: 10.1177/0278364908100561
           </p>
           <p>
-            고정된 위치의 acoustic transponder에만 의존하는 대신, 이동하는 AUV들이 acoustic ranging과 데이터를 교환하면서
-            서로의 위치추정을 돕는 Cooperative Localization 방법을 연구하였다.
+            기존 방식처럼 고정된 acoustic transponder 배열에만 의존하지 않고,
+            이동하는 AUV들이 range-only measurement와 dead reckoning 정보를 함께 사용해 후보 궤적을 평가하는 접근을 소개한다.
+            장시간 넓은 해역을 운용해야 하는 임무에서 모바일 AUV 네트워크가 서로의 위치 추정을 도울 수 있다는 점을 보여준다.
           </p>
           <div class="paper-tags">
             <span>#AUV</span>
@@ -422,31 +432,35 @@
       <div class="section-heading reveal">
         <span class="section-number">10</span>
         <h2>Where Can It Be Used?</h2>
+        <p>
+          Cooperative Localization은 한 대의 장비가 모든 정보를 완벽하게 얻기 어려운 환경에서 특히 유용하다.
+          연결된 차량, 드론 편대, 실내 로봇, 수중 AUV처럼 여러 시스템이 같은 공간에서 움직일 때 적용할 수 있다.
+        </p>
       </div>
 
       <div class="application-grid reveal">
         <button class="application-card" type="button">
           <span>01</span>
           <h3>Autonomous Cars</h3>
-          <p>차량 간 정보 공유를 이용하여 위치추정을 보조한다.</p>
+          <p>차량 간 위치, 속도, heading 정보를 공유해 터널 입구나 도심 협곡처럼 GNSS가 흔들리는 구간의 위치추정을 보조한다.</p>
           <em>Connected road scenario expands.</em>
         </button>
         <button class="application-card" type="button">
           <span>02</span>
           <h3>Autonomous Drones</h3>
-          <p>여러 UAV가 협력 임무를 수행할 때 상대 위치 정보와 센서 정보를 활용한다.</p>
+          <p>여러 UAV가 편대 비행이나 탐색 임무를 수행할 때 상대 위치와 센서 정보를 활용해 충돌 위험을 줄인다.</p>
           <em>Formation nodes become linked.</em>
         </button>
         <button class="application-card" type="button">
           <span>03</span>
           <h3>Multi-Robot Systems</h3>
-          <p>공장, 창고, 구조 현장 등의 여러 로봇이 서로 협력한다.</p>
+          <p>공장, 창고, 구조 현장 등의 여러 로봇이 서로의 관측값을 공유해 지도와 위치 신뢰도를 함께 높인다.</p>
           <em>Shared map confidence rises.</em>
         </button>
         <button class="application-card" type="button">
           <span>04</span>
           <h3>Autonomous Underwater Vehicles</h3>
-          <p>GNSS 사용이 어려운 수중에서 Acoustic Ranging과 항법 정보 공유를 이용한다.</p>
+          <p>GNSS 사용이 어려운 수중에서 acoustic ranging과 항법 정보 공유를 이용해 drift를 완화한다.</p>
           <em>Acoustic links support navigation.</em>
         </button>
       </div>
@@ -456,27 +470,31 @@
       <div class="section-heading reveal">
         <span class="section-number">11</span>
         <h2>Benefits & Challenges</h2>
+        <p>
+          협력 위치추정은 추가 정보를 얻는 만큼 강력하지만, 통신 품질과 데이터 신뢰성도 함께 관리해야 한다.
+          따라서 위치추정 알고리즘뿐 아니라 네트워크, 보안, 시간 동기화까지 함께 고려해야 한다.
+        </p>
       </div>
 
       <div class="benefit-challenge reveal">
         <article>
           <h3>BENEFITS</h3>
           <ul>
-            <li><span>+</span>다른 차량의 정보를 추가적으로 활용 가능</li>
-            <li><span>+</span>GNSS가 제한되는 환경에서도 활용 가능</li>
-            <li><span>+</span>여러 자율주행 차량의 협력 가능</li>
-            <li><span>+</span>자동차, 드론, 로봇, AUV 등 다양한 플랫폼에 적용 가능</li>
+            <li><span>+</span>다른 시스템의 정보를 추가 제약 조건으로 활용할 수 있다.</li>
+            <li><span>+</span>GNSS가 제한되는 환경에서도 위치추정 성능을 보완할 수 있다.</li>
+            <li><span>+</span>여러 자율 시스템이 같은 임무를 수행할 때 전체 위치 일관성을 높인다.</li>
+            <li><span>+</span>자동차, 드론, 실내 로봇, AUV 등 다양한 플랫폼에 적용할 수 있다.</li>
           </ul>
         </article>
         <article>
           <h3>CHALLENGES</h3>
           <ul>
-            <li><span>!</span>차량 간 통신 필요</li>
-            <li><span>!</span>Network Delay</li>
-            <li><span>!</span>Packet Loss</li>
-            <li><span>!</span>Sensor Error</li>
-            <li><span>!</span>Communication Overhead</li>
-            <li><span>!</span>Security / Trust</li>
+            <li><span>!</span>차량 또는 로봇 간 통신 인프라가 필요하다.</li>
+            <li><span>!</span>Network Delay 때문에 오래된 정보가 융합될 수 있다.</li>
+            <li><span>!</span>Packet Loss가 발생하면 협력 링크가 일시적으로 끊길 수 있다.</li>
+            <li><span>!</span>Sensor Error와 잘못된 공유 정보가 전체 추정을 흔들 수 있다.</li>
+            <li><span>!</span>Communication Overhead가 많아지면 실시간성이 떨어질 수 있다.</li>
+            <li><span>!</span>Security / Trust 검증이 없으면 악의적 데이터에 취약해질 수 있다.</li>
           </ul>
         </article>
       </div>
@@ -488,15 +506,15 @@
         <p>TOGETHER, VEHICLES COOPERATE.</p>
         <h2>COOPERATIVE LOCALIZATION</h2>
         <span>
-          자율주행 차량은 더 이상 자신의 센서만 바라보지 않는다.
-          서로 정보를 공유하고 협력하면서 자신의 위치를 추정한다.
+          자율 시스템은 더 이상 자신의 센서만 바라보지 않는다.
+          서로 정보를 공유하고 검증하면, 각자의 위치를 더 안정적으로 추정할 수 있다.
         </span>
         <a class="secondary-button" href="#hero">Back to Top</a>
         <div class="team-links" aria-label="Team member personal homepages">
           <h3>Team Homepages</h3>
           <div class="team-link-grid">
             <a href="https://rlarjsl03.github.io" target="_blank" rel="noopener noreferrer">
-              <strong>나</strong>
+              <strong>rlarjsl03</strong>
               <span>rlarjsl03.github.io</span>
             </a>
             <a href="https://yeonbin123.github.io" target="_blank" rel="noopener noreferrer">
