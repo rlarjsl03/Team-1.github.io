@@ -5,6 +5,12 @@ const navLinks = document.getElementById("navLinks");
 const navItems = Array.from(document.querySelectorAll(".nav-links a"));
 const revealItems = Array.from(document.querySelectorAll(".reveal"));
 const sectionPanels = Array.from(document.querySelectorAll("[data-nav]"));
+const paperDemoSection = document.getElementById("paper-demo");
+const finalSection = document.getElementById("final");
+
+if (paperDemoSection && finalSection) {
+  finalSection.before(paperDemoSection);
+}
 
 function setActiveNavigation(activeKey) {
   navItems.forEach((item) => {
@@ -187,7 +193,9 @@ const cooperativeLayer = document.getElementById("cooperativeLayer");
 const compareDivider = document.getElementById("compareDivider");
 
 function updateComparison(value) {
-  cooperativeLayer.style.width = `${value}%`;
+  const hiddenWidth = 100 - Number(value);
+  cooperativeLayer.style.width = "100%";
+  cooperativeLayer.style.clipPath = `inset(0 ${hiddenWidth}% 0 0)`;
   compareDivider.style.left = `${value}%`;
 }
 
@@ -197,6 +205,7 @@ updateComparison(compareSlider.value);
 /* Interactive simulator ------------------------------------------------- */
 const simStage = document.getElementById("simStage");
 const simObjects = Array.from(document.querySelectorAll(".sim-object"));
+const simLinks = Array.from(document.querySelectorAll(".sim-link"));
 const modeButtons = Array.from(document.querySelectorAll(".mode-button"));
 const errorValue = document.getElementById("errorValue");
 const errorBar = document.getElementById("errorBar");
@@ -264,12 +273,14 @@ function animateSimulator(now) {
   const stageWidth = simStage.clientWidth;
   const stageHeight = simStage.clientHeight;
   let errorSum = 0;
+  const actualPositions = [];
 
   vehicles.forEach((vehicle, index) => {
     const wave = Math.sin(elapsed * 0.75 + vehicle.phase);
     const wave2 = Math.cos(elapsed * 0.52 + vehicle.phase);
     const actualX = vehicle.baseX + wave * 5;
     const actualY = vehicle.baseY + wave2 * 5;
+    actualPositions.push({ x: actualX, y: actualY });
     const driftScale = simulatorMode === "cooperative"
       ? 0.28 + Math.sin(elapsed * 2 + index) * 0.04
       : Math.min(1.15, 0.28 + elapsed * 0.075);
@@ -285,6 +296,18 @@ function animateSimulator(now) {
 
     const estimatedDot = object.querySelector(".estimated-dot");
     estimatedDot.style.transform = `translate(calc(-50% + ${estimatedXOffset}px), calc(-50% + ${estimatedYOffset}px))`;
+  });
+
+  // Keep the SVG links in the same coordinate system as the moving AUVs.
+  const linkPairs = [[0, 1], [1, 2], [0, 2]];
+  simLinks.forEach((line, index) => {
+    const [from, to] = linkPairs[index];
+    if (!actualPositions[from] || !actualPositions[to]) return;
+
+    line.setAttribute("x1", String((actualPositions[from].x / 100) * 900));
+    line.setAttribute("y1", String((actualPositions[from].y / 100) * 420));
+    line.setAttribute("x2", String((actualPositions[to].x / 100) * 900));
+    line.setAttribute("y2", String((actualPositions[to].y / 100) * 420));
   });
 
   const averageError = errorSum / vehicles.length;
@@ -306,6 +329,142 @@ function animateSimulator(now) {
 
 setSimulatorMode("independent");
 requestAnimationFrame(animateSimulator);
+
+/* Paper-based cooperative navigation demo ------------------------------ */
+const paperDemoStage = document.querySelector(".paper-demo-stage");
+const paperDemoStatus = document.getElementById("paperDemoStatus");
+const paperRestart = document.getElementById("paperRestart");
+const paperDrOnly = document.getElementById("paperDrOnly");
+const paperEnable = document.getElementById("paperEnable");
+const paperActualPath = document.getElementById("paperActualPath");
+const paperDeadPath = document.getElementById("paperDeadPath");
+const paperRangeA = document.getElementById("paperRangeA");
+const paperRangeB = document.getElementById("paperRangeB");
+const paperPingA = document.getElementById("paperPingA");
+const paperPingB = document.getElementById("paperPingB");
+const paperCnaA = document.querySelector(".paper-cna.cna-a");
+const paperCnaB = document.querySelector(".paper-cna.cna-b");
+const paperUncertainty = document.getElementById("paperUncertainty");
+const paperDeadTarget = document.getElementById("paperDeadTarget");
+const paperCorrectedTarget = document.getElementById("paperCorrectedTarget");
+const paperActualTarget = document.getElementById("paperActualTarget");
+const paperCandidatePaths = [
+  document.getElementById("paperCandidateOne"),
+  document.getElementById("paperCandidateTwo"),
+  document.getElementById("paperCandidateThree")
+];
+
+let paperDemoStart = performance.now();
+let paperDemoMode = "cooperative";
+
+function paperPoint(progress, variant = "actual") {
+  const x = 300 + progress * 132;
+  const y = 390 - progress * 104 + Math.sin(progress * Math.PI) * 10;
+  if (variant === "dead") {
+    return { x: x + progress ** 1.55 * 92, y: y + progress ** 1.45 * 60 };
+  }
+  if (variant === "corrected") {
+    const dead = paperPoint(progress, "dead");
+    const correction = Math.max(0, (progress - 0.7) / 0.3);
+    return { x: dead.x + (x - dead.x) * correction, y: dead.y + (y - dead.y) * correction };
+  }
+  return { x, y };
+}
+
+function paperPath(variant, offset = 0, maxProgress = 1) {
+  const points = [];
+  const pointCount = Math.max(1, Math.round(28 * maxProgress));
+  for (let index = 0; index <= pointCount; index += 1) {
+    const progress = index / 28;
+    const point = paperPoint(progress, variant);
+    points.push(`${index === 0 ? "M" : "L"} ${point.x + offset * progress} ${point.y - offset * progress * 0.35}`);
+  }
+  return points.join(" ");
+}
+
+function setPaperButtonState() {
+  paperDrOnly.classList.toggle("active", paperDemoMode === "dead-reckoning");
+  paperEnable.classList.toggle("active", paperDemoMode === "cooperative");
+}
+
+function resetPaperDemo(mode = "cooperative") {
+  paperDemoMode = mode;
+  paperDemoStart = performance.now();
+  paperDemoStage.classList.remove("ranges-visible", "pings-visible", "candidates-visible", "drift-visible");
+  paperDeadTarget.classList.remove("visible");
+  paperCorrectedTarget.classList.remove("visible");
+  paperActualTarget.classList.remove("visible");
+  setPaperButtonState();
+}
+
+function animatePaperDemo(now) {
+  const cycle = ((now - paperDemoStart) / 18000) % 1;
+  const progress = Math.min(cycle / 0.78, 1);
+  const actual = paperPoint(progress, "actual");
+  const dead = paperPoint(progress, "dead");
+  const corrected = paperPoint(progress, "corrected");
+  const cooperativeEnabled = paperDemoMode === "cooperative";
+  const cnaA = { x: 205 + Math.sin(now / 4200) * 8, y: 165 + Math.cos(now / 5200) * 6 };
+  const cnaB = { x: 705 + Math.sin(now / 4700 + 1.4) * 9, y: 185 + Math.cos(now / 5600 + 1.2) * 7 };
+
+  paperActualPath.setAttribute("d", paperPath("actual", 0, progress));
+  paperDeadPath.setAttribute("d", paperPath("dead", 0, progress));
+  paperCandidatePaths[0].setAttribute("d", paperPath("dead", 48));
+  paperCandidatePaths[1].setAttribute("d", paperPath("corrected", 0));
+  paperCandidatePaths[2].setAttribute("d", paperPath("dead", -34));
+  paperActualTarget.setAttribute("transform", `translate(${actual.x} ${actual.y})`);
+  paperDeadTarget.setAttribute("transform", `translate(${dead.x} ${dead.y})`);
+  paperCorrectedTarget.setAttribute("transform", `translate(${corrected.x} ${corrected.y})`);
+  paperCnaA.setAttribute("transform", `translate(${cnaA.x} ${cnaA.y})`);
+  paperCnaB.setAttribute("transform", `translate(${cnaB.x} ${cnaB.y})`);
+  paperUncertainty.setAttribute("cx", dead.x);
+  paperUncertainty.setAttribute("cy", dead.y);
+  paperUncertainty.setAttribute("r", String(28 + progress * 48));
+
+  const rangeProgress = Math.min(Math.max((cycle - 0.16) / 0.24, 0), 1);
+  paperRangeA.setAttribute("cx", String(cnaA.x));
+  paperRangeA.setAttribute("cy", String(cnaA.y));
+  paperRangeB.setAttribute("cx", String(cnaB.x));
+  paperRangeB.setAttribute("cy", String(cnaB.y));
+  paperRangeA.setAttribute("r", String(rangeProgress * 290));
+  paperRangeB.setAttribute("r", String(rangeProgress * 330));
+  paperPingA.setAttribute("x1", cnaA.x);
+  paperPingA.setAttribute("y1", cnaA.y);
+  paperPingA.setAttribute("x2", actual.x);
+  paperPingA.setAttribute("y2", actual.y);
+  paperPingB.setAttribute("x1", cnaB.x);
+  paperPingB.setAttribute("y1", cnaB.y);
+  paperPingB.setAttribute("x2", actual.x);
+  paperPingB.setAttribute("y2", actual.y);
+
+  paperActualTarget.classList.add("visible");
+  paperDeadTarget.classList.toggle("visible", progress > 0.03);
+  paperDemoStage.classList.toggle("drift-visible", progress > 0.12);
+  paperDemoStage.classList.toggle("ranges-visible", cooperativeEnabled && cycle > 0.16);
+  paperDemoStage.classList.toggle("pings-visible", cooperativeEnabled && cycle > 0.16 && cycle < 0.54);
+  paperDemoStage.classList.toggle("candidates-visible", cooperativeEnabled && cycle > 0.43);
+  paperCorrectedTarget.classList.toggle("visible", cooperativeEnabled && cycle > 0.7);
+
+  if (!cooperativeEnabled) {
+    paperDemoStatus.textContent = "Dead Reckoning Only: 시간이 지날수록 추정 오차가 누적됩니다.";
+  } else if (cycle < 0.16) {
+    paperDemoStatus.textContent = "STEP 1 · INS / DVL Dead Reckoning — Error accumulates over time.";
+  } else if (cycle < 0.43) {
+    paperDemoStatus.textContent = "STEP 2 · Acoustic Time-of-Flight — CNA A/B가 range-only measurement를 보냅니다.";
+  } else if (cycle < 0.7) {
+    paperDemoStatus.textContent = "STEP 3 · Constraint Evaluation — candidate trajectory의 residual/cost를 비교합니다.";
+  } else {
+    paperDemoStatus.textContent = "STEP 4 · Position Correction — minimum-cost trajectory에 cooperative estimate를 보정합니다.";
+  }
+
+  requestAnimationFrame(animatePaperDemo);
+}
+
+paperRestart.addEventListener("click", () => resetPaperDemo("cooperative"));
+paperDrOnly.addEventListener("click", () => resetPaperDemo("dead-reckoning"));
+paperEnable.addEventListener("click", () => resetPaperDemo("cooperative"));
+resetPaperDemo();
+requestAnimationFrame(animatePaperDemo);
 
 /* Application cards ----------------------------------------------------- */
 const applicationCards = Array.from(document.querySelectorAll(".application-card"));
