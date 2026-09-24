@@ -58,6 +58,44 @@ revealItems.forEach((item) => revealObserver.observe(item));
 window.addEventListener("scroll", handleNavScroll, { passive: true });
 handleNavScroll();
 
+/* Section keyboard navigation ------------------------------------------ */
+const keyboardSections = Array.from(document.querySelectorAll("main > section.section-panel"));
+
+function getCurrentSectionIndex() {
+  const referenceY = window.scrollY + Math.min(window.innerHeight * 0.35, 260);
+  let currentIndex = 0;
+  let closestDistance = Number.POSITIVE_INFINITY;
+
+  keyboardSections.forEach((section, index) => {
+    const distance = Math.abs(section.offsetTop - referenceY);
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      currentIndex = index;
+    }
+  });
+
+  return currentIndex;
+}
+
+window.addEventListener("keydown", (event) => {
+  const activeElement = document.activeElement;
+  const isTyping = activeElement && (
+    activeElement.matches("input, textarea, select") ||
+    activeElement.isContentEditable
+  );
+
+  if (isTyping || !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+
+  const currentIndex = getCurrentSectionIndex();
+  const direction = event.key === "ArrowRight" ? 1 : -1;
+  const nextIndex = Math.max(0, Math.min(keyboardSections.length - 1, currentIndex + direction));
+
+  if (nextIndex === currentIndex) return;
+
+  event.preventDefault();
+  keyboardSections[nextIndex].scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
 /* Localization sensor panel -------------------------------------------- */
 const sensorDescriptions = {
   gnss: {
